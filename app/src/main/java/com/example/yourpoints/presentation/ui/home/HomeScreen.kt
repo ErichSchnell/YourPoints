@@ -1,6 +1,7 @@
 package com.example.yourpoints.presentation.ui.home
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,9 +13,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,13 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.yourpoints.ui.theme.Background
-import com.example.yourpoints.ui.theme.Primary
-import com.example.yourpoints.ui.theme.Secondary
-import java.time.LocalTime
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
@@ -46,28 +55,30 @@ fun HomeScreen(
     Box (
         modifier = Modifier
             .fillMaxSize()
-            .background(Background),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ){
         when(uiState){
             HomeViewState.LOADING -> Loading(Modifier.align(Alignment.Center))
             HomeViewState.SUCCESS -> {
 
-                StartAnnotator(Modifier.align(Alignment.BottomEnd)){showDialog = true}
+
             }
         }
-
+        StartAnnotator(Modifier.align(Alignment.BottomEnd)){showDialog = true}
 
 
         if (showDialog) {
             DialogSelectAnnotator(
                 onDismissRequest = { showDialog = false },
-                onClickAnnotatorGenerico = {time ->  homeViewModel.navigateTo(userEmail, time, navigateToGenerico)},
-                onClickAnnotatorTruco = {time ->  homeViewModel.navigateTo(userEmail, time, navigateToTruco) },
-                onClickAnnotatorGenerala = {time ->  homeViewModel.navigateTo(userEmail, time, navigateToGenerala) }
+                onClickAnnotatorGenerico = {time ->  homeViewModel.navigateTo(time, navigateToGenerico)},
+                onClickAnnotatorTruco = {time ->  homeViewModel.navigateTo(time, navigateToTruco) },
+                onClickAnnotatorGenerala = {time ->  homeViewModel.navigateTo(time, navigateToGenerala) }
             )
         }
     }
+
+
 }
 
 
@@ -80,8 +91,7 @@ fun Loading(modifier: Modifier) {
     ) {
         CircularProgressIndicator(
             modifier = Modifier.size(38.dp),
-            color = Secondary,
-            backgroundColor = Primary,
+            color = MaterialTheme.colorScheme.onBackground,
             strokeWidth = 2.dp
         )
     }
@@ -106,8 +116,9 @@ fun DialogSelectAnnotator(
     onClickAnnotatorTruco: (time:String) -> Unit,
     onClickAnnotatorGenerala: (time:String) -> Unit
 ){
-    val currentTime = LocalTime.now()
-    val formattedTime = currentTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+
+    val currentDateTime = LocalDateTime.now()
+    val formattedDateTime = currentDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
@@ -115,14 +126,14 @@ fun DialogSelectAnnotator(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Annotator(text = "GENERICO")  {onClickAnnotatorGenerico(formattedTime)}
-            Annotator(text = "TRUCO") {onClickAnnotatorTruco(formattedTime)}
-            Annotator(text = "GENERALA") {onClickAnnotatorGenerala(formattedTime)}
+            Annotator(text = "GENERICO")  {onClickAnnotatorGenerico(formattedDateTime)}
+            Annotator(text = "TRUCO") {onClickAnnotatorTruco(formattedDateTime)}
+            Annotator(text = "GENERALA") {onClickAnnotatorGenerala(formattedDateTime)}
         }
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Annotator(
     modifier: Modifier = Modifier,
@@ -135,9 +146,11 @@ fun Annotator(
             .height(100.dp)
             .padding(8.dp)
             .clickable { onClick() },
-        backgroundColor = Orange1,
-        contentColor = Accent,
-        elevation = 12.dp,
+        colors = CardDefaults.cardColors(
+            contentColor = MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
         onClick = {onClick()}
     ) {
         Column (Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {

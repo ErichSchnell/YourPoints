@@ -1,10 +1,10 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id ("com.google.gms.google-services")
+//    id ("com.google.gms.google-services")
     id ("kotlin-kapt")
     id ("com.google.dagger.hilt.android")
-    id("com.google.firebase.crashlytics")
+//    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -63,15 +63,15 @@ android {
 dependencies {
 
 //    //Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
-
-    implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.android.gms:play-services-auth:21.1.1")
-
-    implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation("com.google.firebase:firebase-storage-ktx")
+//    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
+//    implementation("com.google.firebase:firebase-analytics-ktx")
+//    implementation("com.google.firebase:firebase-crashlytics-ktx")
+//
+//    implementation("com.google.firebase:firebase-auth-ktx")
+//    implementation("com.google.android.gms:play-services-auth:21.1.1")
+//
+//    implementation("com.google.firebase:firebase-firestore-ktx")
+//    implementation("com.google.firebase:firebase-storage-ktx")
 
     //Dagger
     implementation ("com.google.dagger:hilt-android:2.44.2")
