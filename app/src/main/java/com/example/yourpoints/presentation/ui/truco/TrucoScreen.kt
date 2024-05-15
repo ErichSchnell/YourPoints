@@ -221,7 +221,7 @@ fun Cabecera(
                 .size(44.dp)
                 .clickable { onClickSetting() },
             imageVector = Icons.Default.Settings,
-            tint = MaterialTheme.colorScheme.inversePrimary,
+            tint = MaterialTheme.colorScheme.tertiary,
             contentDescription = ""
         )
 
@@ -339,10 +339,10 @@ fun RestarPuntos(
         Box (modifier = Modifier
             .fillMaxHeight()
             .weight(1f)
-            .background(MaterialTheme.colorScheme.secondary)
+            .background(MaterialTheme.colorScheme.tertiary)
             .clickable { decreasePlayer1() },
             contentAlignment = Alignment.Center){
-            Text(text = string_restar_point, fontSize = 24.sp, color = MaterialTheme.colorScheme.onSecondary, fontWeight = FontWeight.ExtraLight)
+            Text(text = string_restar_point, fontSize = 24.sp, color = MaterialTheme.colorScheme.onTertiary, fontWeight = FontWeight.ExtraLight)
         }
         Divider(
             color = MaterialTheme.colorScheme.inversePrimary,
@@ -353,10 +353,10 @@ fun RestarPuntos(
         Box (modifier = Modifier
             .fillMaxHeight()
             .weight(1f)
-            .background(MaterialTheme.colorScheme.secondary)
+            .background(MaterialTheme.colorScheme.tertiary)
             .clickable { decreasePlayer2() },
             contentAlignment = Alignment.Center){
-            Text(text = string_restar_point, fontSize = 24.sp, color = MaterialTheme.colorScheme.onSecondary, fontWeight = FontWeight.ExtraLight)
+            Text(text = string_restar_point, fontSize = 24.sp, color = MaterialTheme.colorScheme.onTertiary, fontWeight = FontWeight.ExtraLight)
         }
     }
 }
@@ -370,9 +370,9 @@ fun DialogSetting(pointCurrent:Int ,onDismissRequest:() -> Unit, onClickResetAnn
         Card (
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .padding(horizontal = 16.dp)
-                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(24.dp))
+                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
         ) {
             Column(modifier = Modifier
                 .fillMaxWidth()
@@ -391,14 +391,14 @@ fun DialogSetting(pointCurrent:Int ,onDismissRequest:() -> Unit, onClickResetAnn
                             selected = selectedPoint == points,
                             onClick = { selectedPoint = points }
                         )
-                        Text(text = "$points")
+                        Text(text = "$points", color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
                 Button(
                     modifier = Modifier.padding(24.dp),
                     colors = ButtonDefaults.buttonColors(
-                        contentColor = MaterialTheme.colorScheme.primary,
-                        containerColor = MaterialTheme.colorScheme.inversePrimary,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                     ),onClick = { onClickResetAnnotator(selectedPoint) }) {
                     Text(text = "RESET")
                 }
@@ -416,20 +416,20 @@ fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit)
         Card (
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .padding(horizontal = 16.dp)
-                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(24.dp))
+                .border(2.dp, MaterialTheme.colorScheme.primary,RoundedCornerShape(12.dp))
         ) {
             Column(modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.background),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
-                    label = { Text(text = "New Name", color = MaterialTheme.colorScheme.secondary) },
+                    label = { Text(text = "New Name", color = MaterialTheme.colorScheme.tertiary) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
@@ -450,17 +450,17 @@ fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit)
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         cursorColor = MaterialTheme.colorScheme.primary,
-                        focusedTextColor = MaterialTheme.colorScheme.inversePrimary,
+                        focusedTextColor = MaterialTheme.colorScheme.primary,
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.secondary
+                        unfocusedBorderColor = MaterialTheme.colorScheme.tertiary
                     )
                 )
 
                 Button(
                     modifier = Modifier.padding(24.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.onPrimary,
-                        contentColor = MaterialTheme.colorScheme.primary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     onClick = {
                         onChangeName(name)
@@ -484,14 +484,14 @@ fun DialogFinishGame(winner:String, onClickCancel:() -> Unit, onClickResetAnnota
         Card (
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .padding(horizontal = 16.dp)
-                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(24.dp)),
+                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)),
 
             ) {
             Column(modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.background),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -499,26 +499,26 @@ fun DialogFinishGame(winner:String, onClickCancel:() -> Unit, onClickResetAnnota
 
                 Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
                     Text(text = string_winner_game, fontSize = 24.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                    Text(text = " $winner", fontSize = 24.sp, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
+                    Text(text = " $winner", fontSize = 24.sp, color = MaterialTheme.colorScheme.inversePrimary, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Row (modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp), horizontalArrangement = Arrangement.Center) {
+                    .padding(24.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                     Button(
-                        modifier = Modifier.padding(end = 24.dp),
+                        modifier = Modifier.padding(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.onPrimary,
-                            contentColor = MaterialTheme.colorScheme.primary
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         ),onClick = {onClickCancel()}) {
                         Text(text = string_cancel)
                     }
                     Button(
-                        modifier = Modifier.padding(end = 24.dp),
+                        modifier = Modifier.padding(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.onPrimary,
-                            contentColor = MaterialTheme.colorScheme.primary
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         ),onClick = {onClickResetAnnotator()}) {
                         Text(text = string_reset)
                     }
