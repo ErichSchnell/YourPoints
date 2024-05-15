@@ -1,13 +1,20 @@
 package com.example.yourpoints.presentation.ui.truco
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import com.example.yourpoints.presentation.model.TrucoModelUI
 import com.example.yourpoints.presentation.model.TypePlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 const val TAG = "TrucoViewModel Intern Test"
 
@@ -22,8 +29,12 @@ class TrucoViewModel @Inject constructor(
     private val _game = MutableStateFlow<TrucoModelUI>(TrucoModelUI())
     val game: StateFlow<TrucoModelUI> = _game
 
+
+    init {
+        initAnnotator(annotatorTime = getDate())
+    }
     fun initAnnotator(annotatorTime: String) {
-        _game.value = TrucoModelUI(pointLimit = 30)
+        _game.value = TrucoModelUI(id = annotatorTime, pointLimit = 30)
         _uiState.value = TrucoViewState.SUCCESS
 
         Log.i(TAG, "initAnnotator: ${_game.value}")
@@ -80,6 +91,11 @@ class TrucoViewModel @Inject constructor(
             _game.value = _game.value.decreasePlayer2()
         }
         Log.i(TAG, "player2: ${_game.value.player2.playerPoint}")
+    }
+
+    private fun getDate(): String{
+        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        return formatter.format(Calendar.getInstance().time)
     }
 }
 

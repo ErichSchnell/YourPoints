@@ -41,13 +41,13 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
-    navigateToTruco: (String) -> Unit,
-    navigateToGenerico: (String) -> Unit,
-    navigateToGenerala: (String) -> Unit
+    navigateToTruco: () -> Unit,
+    navigateToGenerico: () -> Unit,
+    navigateToGenerala: () -> Unit
 ){
     var showDialog by remember{ mutableStateOf(false) }
     val uiState by homeViewModel.uiState.collectAsState()
@@ -72,9 +72,9 @@ fun HomeScreen(
         if (showDialog) {
             DialogSelectAnnotator(
                 onDismissRequest = { showDialog = false },
-                onClickAnnotatorGenerico = {time ->  homeViewModel.navigateTo(time, navigateToGenerico)},
-                onClickAnnotatorTruco = {time ->  homeViewModel.navigateTo(time, navigateToTruco) },
-                onClickAnnotatorGenerala = {time ->  homeViewModel.navigateTo(time, navigateToGenerala) }
+                onClickAnnotatorGenerico = {homeViewModel.navigateTo(navigateToGenerico)},
+                onClickAnnotatorTruco = {homeViewModel.navigateTo(navigateToTruco) },
+                onClickAnnotatorGenerala = {homeViewModel.navigateTo(navigateToGenerala) }
             )
         }
     }
@@ -109,17 +109,14 @@ fun StartAnnotator(modifier: Modifier = Modifier, onClick: () -> Unit) {
     }
 
 }
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun DialogSelectAnnotator(
     onDismissRequest: () -> Unit,
-    onClickAnnotatorGenerico: (time:String) -> Unit,
-    onClickAnnotatorTruco: (time:String) -> Unit,
-    onClickAnnotatorGenerala: (time:String) -> Unit
+    onClickAnnotatorGenerico: () -> Unit,
+    onClickAnnotatorTruco: () -> Unit,
+    onClickAnnotatorGenerala: () -> Unit
 ){
-
-    val currentDateTime = LocalDateTime.now()
-    val formattedDateTime = currentDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
@@ -127,9 +124,9 @@ fun DialogSelectAnnotator(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Annotator(text = "GENERICO")  {onClickAnnotatorGenerico(formattedDateTime)}
-            Annotator(text = "TRUCO") {onClickAnnotatorTruco(formattedDateTime)}
-            Annotator(text = "GENERALA") {onClickAnnotatorGenerala(formattedDateTime)}
+            Annotator(text = "GENERICO")  {onClickAnnotatorGenerico()}
+            Annotator(text = "TRUCO") {onClickAnnotatorTruco()}
+            Annotator(text = "GENERALA") {onClickAnnotatorGenerala()}
         }
     }
 }

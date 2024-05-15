@@ -18,9 +18,8 @@ class HomeViewModel @Inject constructor(
     val uiState:StateFlow<HomeViewState> = _uiState
 
 
-    fun navigateTo(time:String, navigateToAnnotator: (String) -> Unit) {
-        Log.i(TAG, "HomeViewModel navigateTo: $time")
-        navigateToAnnotator(time)
+    fun navigateTo(navigateToAnnotator: () -> Unit) {
+        navigateToAnnotator()
     }
 }
 

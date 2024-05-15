@@ -1,14 +1,14 @@
 package com.example.yourpoints.presentation.model
 
-data class TrucoModelUI(
+import com.example.yourpoints.domain.model.TrucoDomain
+
+data class TrucoUI(
+    val id:String = "",
     val pointLimit:Int = 0,
     val player1: TrucoPlayerModelUi = TrucoPlayerModelUi("Nosotros"),
     val player2: TrucoPlayerModelUi = TrucoPlayerModelUi("Ellos"),
     val winner: TypePlayer = TypePlayer.VACIO
 ) {
-
-    fun toTrucoModelData() = TrucoModelUI()
-
     fun resetPoint(point:Int) = this.copy(
         pointLimit = point,
         player1 = this.player1.setPoint(0),
@@ -40,3 +40,13 @@ sealed class TypePlayer(id:Int){
     object PLAYER1:TypePlayer(1)
     object PLAYER2:TypePlayer(2)
 }
+
+
+
+fun TrucoDomain.toUi() = TrucoUI(
+    id = id,
+    pointLimit = pointLimit,
+    player1 = player1,
+    player2 = player2,
+    winner = winner,
+)

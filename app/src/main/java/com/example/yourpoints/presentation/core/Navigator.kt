@@ -15,7 +15,7 @@ import com.example.yourpoints.presentation.ui.truco.TrucoScreen
 
 const val TAG = "Navigator Intern Test"
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun ContentWrapper(navigatonController: NavHostController) {
 
@@ -26,29 +26,18 @@ fun ContentWrapper(navigatonController: NavHostController) {
     ) {
         composable(Home.route) {
             HomeScreen(
-                navigateToGenerala = {time -> navigatonController.navigate(Generala.createRoute(time)) },
-                navigateToGenerico = {time -> navigatonController.navigate(Generico.createRoute(time)) },
-                navigateToTruco = {time -> navigatonController.navigate(Truco.createRoute(time)) }
+                navigateToGenerala = {navigatonController.navigate(Generala.route) },
+                navigateToGenerico = {navigatonController.navigate(Generico.route) },
+                navigateToTruco = {navigatonController.navigate(Truco.route) }
             )
         }
-        composable(
-            Generico.route,
-            arguments = listOf(navArgument("time"){ type = NavType.StringType})
-        ) {
+        composable(Generico.route) {
             Log.i(TAG, "Generico.route")
         }
-        composable(
-            Truco.route,
-            arguments = listOf(navArgument("time"){ type = NavType.StringType})
-        ) {
-            TrucoScreen(
-                annotatorTime = it.arguments?.getString("time").orEmpty()
-            )
+        composable(Truco.route) {
+            TrucoScreen()
         }
-        composable(
-            Generala.route,
-            arguments = listOf(navArgument("time"){ type = NavType.StringType})
-        ) {
+        composable(Generala.route) {
             Log.i(TAG, "Generala.route")
         }
     }
@@ -57,19 +46,7 @@ fun ContentWrapper(navigatonController: NavHostController) {
 
 sealed class Routes(val route:String){
     object Home: Routes("home")
-    object Generala:Routes("generala/{time}"){
-        fun createRoute(time: String): String{
-            return "generala/$time"
-        }
-    }
-    object Truco:Routes("truco/{time}"){
-        fun createRoute(time: String): String{
-            return "truco/$time"
-        }
-    }
-    object Generico:Routes("generico/{time}"){
-        fun createRoute(time: String): String{
-            return "generico/$time"
-        }
-    }
+    object Generala:Routes("generala")
+    object Truco:Routes("truco")
+    object Generico:Routes("generico")
 }

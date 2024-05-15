@@ -61,13 +61,8 @@ import com.example.yourpoints.presentation.ui.theme.string_winner_game
 
 @Composable
 fun TrucoScreen(
-    trucoViewModel: TrucoViewModel = hiltViewModel(),
-    annotatorTime: String
+    trucoViewModel: TrucoViewModel = hiltViewModel()
 ){
-    LaunchedEffect(true){
-        trucoViewModel.initAnnotator(annotatorTime)
-    }
-
     val uiState by trucoViewModel.uiState.collectAsState()
     val game by trucoViewModel.game.collectAsState()
 
