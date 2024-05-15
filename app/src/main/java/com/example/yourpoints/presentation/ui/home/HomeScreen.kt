@@ -58,6 +58,7 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ){
+
         when(uiState){
             HomeViewState.LOADING -> Loading(Modifier.align(Alignment.Center))
             HomeViewState.SUCCESS -> {
