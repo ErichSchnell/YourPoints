@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrucoDao {
-    @Query("select * from truco_table order by id desc")//where id = :id
+    @Query("select * from truco_table order by id desc")
     suspend fun getGames(): Flow<List<TrucoEntity>>
 
     @Query("select * from truco_table where id = :id ")

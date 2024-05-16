@@ -10,6 +10,8 @@ import javax.inject.Inject
 class GetTrucoGameUseCase @Inject constructor(
     private val annotatorRepository: AnnotatorRepository
 ) {
-    suspend operator fun invoke(id:String) = annotatorRepository.getTrucoGameFromDatabase(id).map { it.toDomain().toUi() }
+    suspend operator fun invoke(id:String) {
+        //annotatorRepository.getTrucoGameFromDatabase(id).map { it.toDomain().toUi() }
+    }
 
 }

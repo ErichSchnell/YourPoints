@@ -4,7 +4,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
-import com.example.yourpoints.presentation.model.TrucoModelUI
+import com.example.yourpoints.presentation.model.TrucoUi
 import com.example.yourpoints.presentation.model.TypePlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,15 +26,15 @@ class TrucoViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<TrucoViewState>(TrucoViewState.LOADING)
     val uiState: StateFlow<TrucoViewState> = _uiState
 
-    private val _game = MutableStateFlow<TrucoModelUI>(TrucoModelUI())
-    val game: StateFlow<TrucoModelUI> = _game
+    private val _game = MutableStateFlow<TrucoUi>(TrucoUi())
+    val game: StateFlow<TrucoUi> = _game
 
 
     init {
         initAnnotator(annotatorTime = getDate())
     }
     fun initAnnotator(annotatorTime: String) {
-        _game.value = TrucoModelUI(id = annotatorTime, pointLimit = 30)
+        _game.value = TrucoUi(id = annotatorTime.hashCode(), pointLimit = 30)
         _uiState.value = TrucoViewState.SUCCESS
 
         Log.i(TAG, "initAnnotator: ${_game.value}")

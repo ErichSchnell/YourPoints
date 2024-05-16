@@ -9,8 +9,7 @@ import com.example.yourpoints.presentation.model.TypePlayer
 
 @Entity(tableName = "truco_table")
 data class TrucoEntity (
-    @PrimaryKey
-    @ColumnInfo(name = "id") val id:String,
+    @PrimaryKey val id:Int,
     @ColumnInfo(name = "pointLimit") val pointLimit:Int = 0,
     @ColumnInfo(name = "player1") val player1: TrucoPlayerModelUi = TrucoPlayerModelUi("Nosotros"),
     @ColumnInfo(name = "player2") val player2: TrucoPlayerModelUi = TrucoPlayerModelUi("Ellos"),

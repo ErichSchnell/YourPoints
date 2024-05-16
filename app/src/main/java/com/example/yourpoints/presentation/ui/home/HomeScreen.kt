@@ -1,24 +1,26 @@
 package com.example.yourpoints.presentation.ui.home
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,23 +36,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-
+import com.example.yourpoints.presentation.model.TrucoUi
 
 @Composable
-fun HomeScreen(
+fun HomeScreen (
     homeViewModel: HomeViewModel = hiltViewModel(),
     navigateToTruco: () -> Unit,
     navigateToGenerico: () -> Unit,
     navigateToGenerala: () -> Unit
-){
+) {
     var showDialog by remember{ mutableStateOf(false) }
     val uiState by homeViewModel.uiState.collectAsState()
+    val games by homeViewModel.games.collectAsState()
 
     Box (
         modifier = Modifier
@@ -62,12 +65,16 @@ fun HomeScreen(
         when(uiState){
             HomeViewState.LOADING -> Loading(Modifier.align(Alignment.Center))
             HomeViewState.SUCCESS -> {
-
-
+                Games(games){
+                    Log.i(TAG, "HomeScreen: Click Game $it")
+                }
+                StartAnnotator(Modifier.align(Alignment.BottomEnd)){showDialog = true}
+            }
+            HomeViewState.ERROR -> {
+                SinGames(Modifier.align(Alignment.Center))
+                StartAnnotator(Modifier.align(Alignment.BottomEnd)){showDialog = true}
             }
         }
-        StartAnnotator(Modifier.align(Alignment.BottomEnd)){showDialog = true}
-
 
         if (showDialog) {
             DialogSelectAnnotator(
@@ -78,10 +85,7 @@ fun HomeScreen(
             )
         }
     }
-
-
 }
-
 
 @Composable
 fun Loading(modifier: Modifier) {
@@ -97,6 +101,88 @@ fun Loading(modifier: Modifier) {
         )
     }
 }
+
+
+
+
+@Composable
+fun Games(games: List<TrucoUi>, onClickGame: (String) -> Unit) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background), horizontalAlignment = Alignment.CenterHorizontally) {
+        if (games.isNotEmpty() == true) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(1),
+                content = {
+                    items(games.size) { game ->
+                        ItemGame(games[game], onClickGame = onClickGame)
+                    }
+                },
+                contentPadding = PaddingValues(16.dp)
+            )
+
+        } else {
+
+        }
+    }
+}
+@Composable
+fun ItemGame(game: TrucoUi, onClickGame: (String) -> Unit){
+    Card(
+        modifier = Modifier
+            .clickable { onClickGame(game.id.toString()) }
+            .clip(RoundedCornerShape(12.dp))
+            .padding(horizontal = 16.dp)
+            .padding(vertical = 8.dp)
+            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        ) {
+
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+
+            ) {
+
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    modifier = Modifier.padding(top = 2.dp),
+                    text = game.id.toString(),
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.weight(1f))
+
+//                if (hall.isPublic) Icon(modifier = Modifier, painter = painterResource(id = R.drawable.ic_lock_open), tint = Orange2, contentDescription = "")
+//                else Icon(painter = painterResource(id = R.drawable.ic_lock), tint = Orange2, contentDescription = "")
+//                Spacer(modifier = Modifier.width(20.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun SinGames(modifier: Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = "Sin Partidas", color = MaterialTheme.colorScheme.tertiary)
+    }
+}
+
+
+
 
 @Composable
 fun StartAnnotator(modifier: Modifier = Modifier, onClick: () -> Unit) {

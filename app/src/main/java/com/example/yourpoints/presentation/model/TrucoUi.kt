@@ -2,8 +2,8 @@ package com.example.yourpoints.presentation.model
 
 import com.example.yourpoints.domain.model.TrucoDomain
 
-data class TrucoUI(
-    val id:String = "",
+data class TrucoUi(
+    val id:Int = 0,
     val pointLimit:Int = 0,
     val player1: TrucoPlayerModelUi = TrucoPlayerModelUi("Nosotros"),
     val player2: TrucoPlayerModelUi = TrucoPlayerModelUi("Ellos"),
@@ -43,7 +43,7 @@ sealed class TypePlayer(id:Int){
 
 
 
-fun TrucoDomain.toUi() = TrucoUI(
+fun TrucoDomain.toUi() = TrucoUi(
     id = id,
     pointLimit = pointLimit,
     player1 = player1,
