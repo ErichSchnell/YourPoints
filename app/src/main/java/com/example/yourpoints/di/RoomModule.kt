@@ -2,7 +2,8 @@ package com.example.yourpoints.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.yourpoints.data.database.DatabaseGameService
+import com.example.yourpoints.data.database.DatabaseService
+import com.example.yourpoints.data.database.dao.TrucoDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,12 +17,14 @@ object RoomModule {
 
     private const val TRUCO_DATABASE_NAME = "truco_database"
 
-    @Singleton
-    @Provides
-    fun provideRoom(@ApplicationContext context: Context) =
-        Room.databaseBuilder(context, DatabaseGameService::class.java, TRUCO_DATABASE_NAME).build()
 
     @Singleton
     @Provides
-    fun provideTrucoDao(db:DatabaseGameService) = db.getTrucoDao()
+    fun provideRoom(@ApplicationContext context: Context): DatabaseService{
+        return Room.databaseBuilder(context, DatabaseService::class.java, TRUCO_DATABASE_NAME).build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideTrucoDao(db:DatabaseService) = db.getTrucoDao()
 }

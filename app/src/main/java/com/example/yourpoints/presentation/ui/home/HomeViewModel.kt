@@ -3,7 +3,7 @@ package com.example.yourpoints.presentation.ui.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yourpoints.domain.model.GetTrucoGamesUseCase
+import com.example.yourpoints.domain.GetTrucoGamesUseCase
 import com.example.yourpoints.presentation.model.TrucoUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -30,15 +30,14 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    getGames()
-//                    getGames().collect {
-//                        _games.value = it
-//                        if (it.isNotEmpty()){
-//                            _uiState.value = HomeViewState.SUCCESS
-//                        } else {
-//                            _uiState.value = HomeViewState.ERROR
-//                        }
-//                    }
+                    val it = getGames()
+                    _games.value = it
+                    if (it.isNotEmpty()){
+                        _uiState.value = HomeViewState.SUCCESS
+                    } else {
+                        _uiState.value = HomeViewState.ERROR
+                    }
+
                 } catch (e:Exception){
                     Log.i(TAG, "Exploto todo ")
                     _uiState.value = HomeViewState.ERROR

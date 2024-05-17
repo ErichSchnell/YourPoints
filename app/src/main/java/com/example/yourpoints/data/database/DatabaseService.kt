@@ -5,7 +5,8 @@ import androidx.room.RoomDatabase
 import com.example.yourpoints.data.database.dao.TrucoDao
 import com.example.yourpoints.data.database.entities.TrucoEntity
 
+
 @Database(entities = [TrucoEntity::class], version = 1)
-abstract class DatabaseGameService: RoomDatabase() {
-    abstract fun getTrucoDao():TrucoDao
+abstract class DatabaseService: RoomDatabase() {
+    abstract fun getTrucoDao(): TrucoDao
 }

@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TrucoDao {
     @Query("select * from truco_table order by id desc")
-    suspend fun getGames(): Flow<List<TrucoEntity>>
+    suspend fun getGames(): List<TrucoEntity>
 
     @Query("select * from truco_table where id = :id ")
-    suspend fun getGame(id: String): Flow<TrucoEntity>
+    suspend fun getGame(id: String): TrucoEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addGame(game: TrucoEntity)

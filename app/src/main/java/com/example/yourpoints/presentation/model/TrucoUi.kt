@@ -45,8 +45,5 @@ sealed class TypePlayer(id:Int){
 
 fun TrucoDomain.toUi() = TrucoUi(
     id = id,
-    pointLimit = pointLimit,
-    player1 = player1,
-    player2 = player2,
-    winner = winner,
+    pointLimit = pointLimit
 )

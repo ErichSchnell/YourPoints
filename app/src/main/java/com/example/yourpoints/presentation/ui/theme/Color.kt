@@ -1,4 +1,5 @@
-package com.example.compose
+package com.example.yourpoints.presentation.ui.theme
+
 import androidx.compose.ui.graphics.Color
 
 val primaryLight = Color(0xFF006B5F)

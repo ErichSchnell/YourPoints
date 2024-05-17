@@ -1,8 +1,6 @@
 package com.example.yourpoints.presentation.ui.truco
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import com.example.yourpoints.presentation.model.TrucoUi
 import com.example.yourpoints.presentation.model.TypePlayer
@@ -10,11 +8,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.minutes
 
 const val TAG = "TrucoViewModel Intern Test"
 
