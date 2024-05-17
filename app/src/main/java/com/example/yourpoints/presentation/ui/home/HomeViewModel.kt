@@ -3,7 +3,9 @@ package com.example.yourpoints.presentation.ui.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.yourpoints.domain.DeleteTrucoGameUseCase
 import com.example.yourpoints.domain.GetTrucoGamesUseCase
+import com.example.yourpoints.domain.model.toDomain
 import com.example.yourpoints.presentation.model.TrucoUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +19,8 @@ const val TAG = "HomeViewModel Intern Test"
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getGames: GetTrucoGamesUseCase
+    private val getGames: GetTrucoGamesUseCase,
+    private val deleteGame: DeleteTrucoGameUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeViewState>(HomeViewState.LOADING)
@@ -30,14 +33,14 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    val it = getGames()
-                    _games.value = it
-                    if (it.isNotEmpty()){
-                        _uiState.value = HomeViewState.SUCCESS
-                    } else {
-                        _uiState.value = HomeViewState.ERROR
+                    getGames().collect {
+                        _games.value = it
+                        if (it.isNotEmpty()){
+                            _uiState.value = HomeViewState.SUCCESS
+                        } else {
+                            _uiState.value = HomeViewState.ERROR
+                        }
                     }
-
                 } catch (e:Exception){
                     Log.i(TAG, "Exploto todo ")
                     _uiState.value = HomeViewState.ERROR
@@ -47,9 +50,22 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun deleteOldGame(id: Int){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    _games.value.forEach{
+                        if (it.id == id) deleteGame(it.toDomain())
+                    }
+                } catch (e:Exception){
+                    Log.i(TAG, "navigateTo: NO SE BORRO")
+                }
+            }
+        }
+    }
 
-    fun navigateTo(navigateToAnnotator: () -> Unit) {
-        navigateToAnnotator()
+    fun navigateTo(navigateToAnnotator: (Int) -> Unit, id:Int = 0) {
+        navigateToAnnotator(id)
     }
 }
 

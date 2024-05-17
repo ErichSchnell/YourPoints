@@ -11,15 +11,10 @@ import javax.inject.Inject
 
 const val TAG = "GetTrucoGamesUseCase Intern Test"
 class GetTrucoGamesUseCase @Inject constructor(private val annotatorRepository: AnnotatorRepository) {
-    suspend operator fun invoke(): List<TrucoUi>{
-        Log.i(TAG, "antes del try")
-        return try {
-            Log.i(TAG, "en el try")
-            annotatorRepository.getAllTrucoGamesFromDatabase()
-                .map { it.toUi() }
-        } catch (e: Exception) {
-            Log.i(TAG, "en el catch")
-            emptyList<TrucoUi>()
-        }
+    operator fun invoke(): Flow<List<TrucoUi>> =  try {
+        annotatorRepository.getAllTrucoGamesFromDatabase().map { item -> item.map { it.toUi() } }
+    } catch (e: Exception) {
+        flow<List<TrucoUi>> { emptyList<TrucoUi>() }
     }
+
 }

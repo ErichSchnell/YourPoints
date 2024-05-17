@@ -17,16 +17,24 @@ class AnnotatorRepository @Inject constructor(
     private val trucoDao: TrucoDao
 ) {
 
-    suspend fun getAllTrucoGamesFromDatabase(): List<TrucoDomain>{
-        return trucoDao.getGames().map { it.toDomain() }
+    fun getAllTrucoGamesFromDatabase(): Flow<List<TrucoDomain>>{
+        return trucoDao.getGames().map{ item -> item.map{ it.toDomain() } }
     }
 
-    suspend fun getTrucoGameFromDatabase(id:String): TrucoDomain {
+    fun getTrucoGameFromDatabase(id:Int): TrucoDomain {
         return trucoDao.getGame(id).toDomain()
     }
 
     suspend fun addTrucoGame(trucoEntity: TrucoEntity){
         trucoDao.addGame(trucoEntity)
+    }
+
+    suspend fun updateTrucoGame(trucoEntity: TrucoEntity){
+        trucoDao.updateGame(trucoEntity)
+    }
+
+    suspend fun deleteTrucoGame(trucoEntity: TrucoEntity){
+        trucoDao.deleteGame(trucoEntity)
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.yourpoints.presentation.ui.truco
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,6 +34,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,8 +61,14 @@ import com.example.yourpoints.presentation.ui.theme.string_winner_game
 
 @Composable
 fun TrucoScreen(
-    trucoViewModel: TrucoViewModel = hiltViewModel()
+    trucoViewModel: TrucoViewModel = hiltViewModel(),
+    gameId:Int
 ){
+
+    LaunchedEffect(true){
+        trucoViewModel.initAnnotator(gameId)
+    }
+
     val uiState by trucoViewModel.uiState.collectAsState()
     val game by trucoViewModel.game.collectAsState()
 

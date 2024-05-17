@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,9 +49,9 @@ import com.example.yourpoints.presentation.model.TrucoUi
 @Composable
 fun HomeScreen (
     homeViewModel: HomeViewModel = hiltViewModel(),
-    navigateToTruco: () -> Unit,
-    navigateToGenerico: () -> Unit,
-    navigateToGenerala: () -> Unit
+    navigateToTruco: (Int) -> Unit,
+    navigateToGenerico: (Int) -> Unit,
+    navigateToGenerala: (Int) -> Unit
 ) {
     var showDialog by remember{ mutableStateOf(false) }
     val uiState by homeViewModel.uiState.collectAsState()
@@ -65,9 +67,17 @@ fun HomeScreen (
         when(uiState){
             HomeViewState.LOADING -> Loading(Modifier.align(Alignment.Center))
             HomeViewState.SUCCESS -> {
-                Games(games){
-                    Log.i(TAG, "HomeScreen: Click Game $it")
-                }
+                Games(
+                    games,
+                    onClickGame = {id ->
+                        Log.i(TAG, "HomeScreen: Click Game $id")
+                        homeViewModel.navigateTo(navigateToTruco, id)
+                    },
+                    onDeleteGame = {id ->
+                        Log.i(TAG, "HomeScreen: Delete Game $id")
+                        homeViewModel.deleteOldGame(id)
+                    }
+                )
                 StartAnnotator(Modifier.align(Alignment.BottomEnd)){showDialog = true}
             }
             HomeViewState.ERROR -> {
@@ -80,7 +90,7 @@ fun HomeScreen (
             DialogSelectAnnotator(
                 onDismissRequest = { showDialog = false },
                 onClickAnnotatorGenerico = {homeViewModel.navigateTo(navigateToGenerico)},
-                onClickAnnotatorTruco = {homeViewModel.navigateTo(navigateToTruco) },
+                onClickAnnotatorTruco = {homeViewModel.navigateTo(navigateToTruco)},
                 onClickAnnotatorGenerala = {homeViewModel.navigateTo(navigateToGenerala) }
             )
         }
@@ -106,7 +116,7 @@ fun Loading(modifier: Modifier) {
 
 
 @Composable
-fun Games(games: List<TrucoUi>, onClickGame: (String) -> Unit) {
+fun Games(games: List<TrucoUi>, onClickGame: (Int) -> Unit, onDeleteGame:(Int) -> Unit) {
     Column(
         Modifier
             .fillMaxSize()
@@ -116,22 +126,30 @@ fun Games(games: List<TrucoUi>, onClickGame: (String) -> Unit) {
                 columns = GridCells.Fixed(1),
                 content = {
                     items(games.size) { game ->
-                        ItemGame(games[game], onClickGame = onClickGame)
+                        ItemGame(
+                            games[game],
+                            onClickGame = onClickGame,
+                            onDeleteGame = onDeleteGame
+                        )
                     }
                 },
                 contentPadding = PaddingValues(16.dp)
             )
 
-        } else {
-
         }
     }
 }
 @Composable
-fun ItemGame(game: TrucoUi, onClickGame: (String) -> Unit){
+fun ItemGame(game: TrucoUi, onClickGame: (Int) -> Unit, onDeleteGame: (Int) -> Unit){
     Card(
         modifier = Modifier
-            .clickable { onClickGame(game.id.toString()) }
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {onDeleteGame(game.id)},
+                    onTap = {onClickGame(game.id)},
+                )
+
+            }
             .clip(RoundedCornerShape(12.dp))
             .padding(horizontal = 16.dp)
             .padding(vertical = 8.dp)
