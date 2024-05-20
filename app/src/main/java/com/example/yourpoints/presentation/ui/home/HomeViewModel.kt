@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-const val TAG = "HomeViewModel Intern Test"
+private const val TAG = "HomeViewModel Intern Test"
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -43,6 +43,7 @@ class HomeViewModel @Inject constructor(
                     }
                 } catch (e:Exception){
                     Log.i(TAG, "Exploto todo ")
+                    Log.i(TAG, "Error mensaje: ${e.message}")
                     _uiState.value = HomeViewState.ERROR
                 }
 
@@ -59,6 +60,7 @@ class HomeViewModel @Inject constructor(
                     }
                 } catch (e:Exception){
                     Log.i(TAG, "navigateTo: NO SE BORRO")
+                    Log.i(TAG, "Error mensaje: ${e.message}")
                 }
             }
         }

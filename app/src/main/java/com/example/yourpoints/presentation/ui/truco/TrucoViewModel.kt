@@ -6,9 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.yourpoints.domain.AddTrucoGameUseCase
 import com.example.yourpoints.domain.GetTrucoGameUseCase
 import com.example.yourpoints.domain.UpdateTrucoGameUseCase
+import com.example.yourpoints.domain.model.TypePlayer
 import com.example.yourpoints.domain.model.toDomain
 import com.example.yourpoints.presentation.model.TrucoUi
-import com.example.yourpoints.presentation.model.TypePlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import javax.inject.Inject
 
-const val TAG = "TrucoViewModel Intern Test"
+private const val TAG = "TrucoViewModel Intern Test"
 
 @HiltViewModel
 class TrucoViewModel @Inject constructor(
@@ -38,24 +38,26 @@ class TrucoViewModel @Inject constructor(
 
 
     fun initAnnotator(gameId: Int) {
+        _uiState.value = TrucoViewState.LOADING
         if (gameId == 0){
-            _id.value = getDate().hashCode()
-            addNewGame()
+            addNewGame(getDate())
         } else {
             _id.value = gameId
             loadGame()
         }
     }
 
-    private fun addNewGame(){
+    private fun addNewGame(date: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    setGame(TrucoUi(id = _id.value, pointLimit = 30).toDomain())
+                    _id.value = date.hashCode()
+                    setGame(TrucoUi(id = _id.value, dataCreated = date).toDomain())
                     loadGame()
                     Log.i(TAG, "Partida Inicializada. ID:${_id.value}")
                 } catch (e:Exception){
                     Log.i(TAG, "Partida No Inicializada. ID:${_id.value}")
+                    Log.i(TAG, "Error mensaje: ${e.message}")
                 }
             }
         }
@@ -70,7 +72,7 @@ class TrucoViewModel @Inject constructor(
 
                 } catch (e:Exception){
                     Log.i(TAG, "Partida No Encontrada. ID:${_id.value}")
-                    Log.i(TAG, "Partida No Encontrada. ID:${_id.value}")
+                    Log.i(TAG, "Error mensaje: ${e.message}")
                 }
             }
         }
@@ -82,6 +84,7 @@ class TrucoViewModel @Inject constructor(
                     updateGame(_game.value.toDomain())
                 } catch (e:Exception){
                     Log.i(TAG, "updateInfoGame: NO SE PUDO ACTUALIZAR")
+                    Log.i(TAG, "Error mensaje: ${e.message}")
                 }
             }
         }

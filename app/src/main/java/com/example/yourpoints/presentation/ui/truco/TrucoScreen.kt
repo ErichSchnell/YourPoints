@@ -37,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,8 +52,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.yourpoints.R
+import com.example.yourpoints.domain.model.TypePlayer
 import com.example.yourpoints.presentation.model.TrucoUi
-import com.example.yourpoints.presentation.model.TypePlayer
 import com.example.yourpoints.presentation.ui.theme.string_cancel
 import com.example.yourpoints.presentation.ui.theme.string_reset
 import com.example.yourpoints.presentation.ui.theme.string_restar_point
@@ -357,7 +358,7 @@ fun RestarPuntos(
 @Composable
 fun DialogSetting(pointCurrent:Int ,onDismissRequest:() -> Unit, onClickResetAnnotator:(Int) -> Unit){
     val pointList = listOf(12, 15, 24, 30)
-    var selectedPoint by remember { mutableStateOf(pointCurrent) }
+    var selectedPoint by remember { mutableIntStateOf(pointCurrent) }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card (

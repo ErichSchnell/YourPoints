@@ -12,7 +12,7 @@ import com.example.yourpoints.presentation.ui.home.HomeScreen
 import com.example.yourpoints.presentation.ui.truco.TrucoScreen
 import dagger.hilt.android.AndroidEntryPoint
 
-const val TAG = "Navigator Intern Test"
+private const val TAG = "Navigator Intern Test"
 
 
 @Composable

@@ -9,11 +9,12 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-const val TAG = "GetTrucoGamesUseCase Intern Test"
+private const val TAG = "GetTrucoGamesUseCase Intern Test"
 class GetTrucoGamesUseCase @Inject constructor(private val annotatorRepository: AnnotatorRepository) {
     operator fun invoke(): Flow<List<TrucoUi>> =  try {
         annotatorRepository.getAllTrucoGamesFromDatabase().map { item -> item.map { it.toUi() } }
     } catch (e: Exception) {
+        Log.i(TAG, "Error mensaje: ${e.message}")
         flow<List<TrucoUi>> { emptyList<TrucoUi>() }
     }
 

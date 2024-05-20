@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,11 +39,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.yourpoints.presentation.model.TrucoUi
+
+private const val TAG = "HomeScreen Intern Test"
 
 @Composable
 fun HomeScreen (
@@ -121,12 +123,15 @@ fun Games(games: List<TrucoUi>, onClickGame: (Int) -> Unit, onDeleteGame:(Int) -
         Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background), horizontalAlignment = Alignment.CenterHorizontally) {
-        if (games.isNotEmpty() == true) {
+        if (games.isNotEmpty()) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(1),
                 content = {
                     items(games.size) { game ->
-                        ItemGame(
+//                        when(game.){
+//
+//                        }
+                        ItemTruco(
                             games[game],
                             onClickGame = onClickGame,
                             onDeleteGame = onDeleteGame
@@ -140,50 +145,62 @@ fun Games(games: List<TrucoUi>, onClickGame: (Int) -> Unit, onDeleteGame:(Int) -
     }
 }
 @Composable
-fun ItemGame(game: TrucoUi, onClickGame: (Int) -> Unit, onDeleteGame: (Int) -> Unit){
+fun ItemTruco(game: TrucoUi, onClickGame: (Int) -> Unit, onDeleteGame: (Int) -> Unit){
     Card(
         modifier = Modifier
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onLongPress = {onDeleteGame(game.id)},
-                    onTap = {onClickGame(game.id)},
+                    onLongPress = { onDeleteGame(game.id) },
+                    onTap = { onClickGame(game.id) },
                 )
-
             }
             .clip(RoundedCornerShape(12.dp))
             .padding(horizontal = 16.dp)
             .padding(vertical = 8.dp)
             .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center
         ) {
 
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-
-            ) {
-
-                Spacer(modifier = Modifier.weight(1f))
+            Row( modifier = Modifier.fillMaxWidth()){
                 Text(
-                    modifier = Modifier.padding(top = 2.dp),
-                    text = game.id.toString(),
+                    modifier = Modifier.weight(1f),
+                    text = game.player1.playerName,
                     fontSize = 24.sp,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = game.pointLimit.toString(),
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.tertiary,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.weight(1f))
-
-//                if (hall.isPublic) Icon(modifier = Modifier, painter = painterResource(id = R.drawable.ic_lock_open), tint = Orange2, contentDescription = "")
-//                else Icon(painter = painterResource(id = R.drawable.ic_lock), tint = Orange2, contentDescription = "")
-//                Spacer(modifier = Modifier.width(20.dp))
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = game.player2.playerName,
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
             }
+
+            Text(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(8.dp),
+                text = game.dataCreated,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.tertiary,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

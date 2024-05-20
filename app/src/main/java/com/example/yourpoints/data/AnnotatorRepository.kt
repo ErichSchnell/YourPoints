@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-const val TAG = "AnnotatorRepository Intern Test"
+private const val TAG = "AnnotatorRepository Intern Test"
 @Singleton
 class AnnotatorRepository @Inject constructor(
     private val trucoDao: TrucoDao
