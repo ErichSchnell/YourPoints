@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.yourpoints.presentation.core.Routes.*
+import com.example.yourpoints.presentation.ui.generico.GenericoScreen
 import com.example.yourpoints.presentation.ui.home.HomeScreen
 import com.example.yourpoints.presentation.ui.truco.TrucoScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,7 +32,9 @@ fun ContentWrapper(navigatonController: NavHostController) {
         composable(
             Generico.route, arguments = listOf(navArgument("gameId") { type = NavType.IntType })
         ) {
-            Log.i(TAG, "Generico.route")
+            GenericoScreen(
+                gameId = it.arguments?.getInt("gameId") ?: 0
+            )
         }
         composable(
             Truco.route, arguments = listOf(navArgument("gameId") { type = NavType.IntType })

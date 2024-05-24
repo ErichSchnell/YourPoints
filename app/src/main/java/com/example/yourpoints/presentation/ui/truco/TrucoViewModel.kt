@@ -36,9 +36,12 @@ class TrucoViewModel @Inject constructor(
 
     private val _id = MutableStateFlow(0)
 
+    init {
+        _uiState.value = TrucoViewState.LOADING
+    }
+
 
     fun initAnnotator(gameId: Int) {
-        _uiState.value = TrucoViewState.LOADING
         if (gameId == 0){
             addNewGame(getDate())
         } else {

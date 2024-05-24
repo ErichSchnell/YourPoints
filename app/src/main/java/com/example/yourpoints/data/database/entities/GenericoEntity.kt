@@ -4,6 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.yourpoints.domain.model.GenericoDomain
+import com.example.yourpoints.domain.model.GenericoPlayerDomain
+import com.example.yourpoints.presentation.model.GenericoPlayerUi
+import com.google.gson.Gson
 
 
 @Entity(tableName = "generico_table")
@@ -11,30 +14,29 @@ data class GenericoEntity(
     @PrimaryKey val id:Int,
     @ColumnInfo(name = "dataCreated") val dataCreated: String = "",
 
-    @ColumnInfo(name = "pointLimit") val pointLimit: Int = 0,
+    @ColumnInfo(name = "withPoints") val withPoints:Boolean = false,
+    @ColumnInfo(name = "pointToInit") val pointToInit:Int = 0,
+    @ColumnInfo(name = "pointToFinish") val pointToFinish:Int = 100,
+    @ColumnInfo(name = "finishToWin") val finishToWin:Boolean = true,
 
-    @ColumnInfo(name = "playerName1") val playerName1: String = "",
-    @ColumnInfo(name = "playerPoint1") val playerPoint1: Int = 0,
-    @ColumnInfo(name = "victories1") val victories1: Int = 0,
+    @ColumnInfo(name = "withRounds") val withRounds:Boolean = false,
+    @ColumnInfo(name = "round") val round:Int = 10,
 
-    @ColumnInfo(name = "playerName2") val playerName2: String = "",
-    @ColumnInfo(name = "playerPoint2") val playerPoint2: Int = 0,
-    @ColumnInfo(name = "victories2") val victories2: Int = 0,
-
-    @ColumnInfo(name = "winner") val winner: Int = 0,
+    @ColumnInfo(name = "playerMax") val playerMax:Int = 30,
+    @ColumnInfo(name = "player") val player:String
 )
 
 
 fun GenericoDomain.toEntity() = GenericoEntity(
     id = id,
     dataCreated = dataCreated,
-    pointLimit = pointLimit,
-    playerName1 = player1.playerName,
-    playerPoint1 = player1.playerPoint,
-    victories1 = player1.victories,
-    playerName2 = player2.playerName,
-    playerPoint2 = player2.playerPoint,
-    victories2 = player2.victories,
-    winner = 0,
+    withPoints = withPoints,
+    pointToInit = pointToInit,
+    pointToFinish = pointToFinish,
+    finishToWin = finishToWin,
+    withRounds = withRounds,
+    round = round,
+    playerMax = playerMax,
+    player = Gson().toJson(player),
 )
 

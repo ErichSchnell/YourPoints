@@ -3,15 +3,24 @@ package com.example.yourpoints.domain.model
 import com.example.yourpoints.data.database.entities.GenericoEntity
 import com.example.yourpoints.presentation.model.GenericoPlayerUi
 import com.example.yourpoints.presentation.model.GenericoUi
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 
 data class GenericoDomain (
     val id:Int,
-    val pointLimit:Int,
-    val dataCreated:String,
-    val player1: GenericoPlayerDomain,
-    val player2: GenericoPlayerDomain,
-    val winner: TypePlayer = TypePlayer.VACIO,
+    val dataCreated: String,
+
+    val withPoints:Boolean,
+    val pointToInit:Int,
+    val pointToFinish:Int,
+    val finishToWin:Boolean,
+
+    val withRounds:Boolean,
+    val round:Int,
+
+    val playerMax:Int,
+    val player:List<GenericoPlayerDomain>
 )
 
 data class GenericoPlayerDomain(
@@ -21,29 +30,33 @@ data class GenericoPlayerDomain(
 )
 
 
-fun GenericoEntity.toDomain() = GenericoDomain(
-    id = id,
-    pointLimit = pointLimit,
-    dataCreated = dataCreated,
-    player1 = GenericoPlayerDomain(
-        playerName = playerName1,
-        playerPoint = playerPoint1,
-        victories = victories1,
-    ),
-    player2 = GenericoPlayerDomain(
-        playerName = playerName2,
-        playerPoint = playerPoint2,
-        victories = victories2,
+fun GenericoEntity.toDomain() :GenericoDomain{
+    val listType = object : TypeToken<List<GenericoPlayerDomain>>() {}.type
+    return GenericoDomain(
+        id = id,
+        dataCreated = dataCreated,
+        withPoints = withPoints,
+        pointToInit = pointToInit,
+        pointToFinish = pointToFinish,
+        finishToWin = finishToWin,
+        withRounds = withRounds,
+        round = round,
+        playerMax = playerMax,
+        player = Gson().fromJson(player, listType),
     )
-)
+}
 
 fun GenericoUi.toDomain() = GenericoDomain(
     id = id,
-    pointLimit = pointLimit,
     dataCreated = dataCreated,
-    player1 = player1.toDomain(),
-    player2 = player2.toDomain(),
-    winner = winner
+    withPoints = withPoints,
+    pointToInit = pointToInit,
+    pointToFinish = pointToFinish,
+    finishToWin = finishToWin,
+    withRounds = withRounds,
+    round = round,
+    playerMax = playerMax,
+    player = player.map { it.toDomain() },
 )
 
 fun GenericoPlayerUi.toDomain() = GenericoPlayerDomain(

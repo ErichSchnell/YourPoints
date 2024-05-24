@@ -88,7 +88,7 @@ fun HomeScreen (
                         } else {
                             Log.i(TAG, "HomeScreen: onJoinGame ${games[index]}")
                             when(games[index]){
-                                is TrucoUi -> {homeViewModel.navigateTo(navigateToTruco, (games[index] as TrucoUi).id)}
+                                is TrucoUi -> { homeViewModel.navigateTo(navigateToTruco, (games[index] as TrucoUi).id)}
                                 is GenericoUi -> {homeViewModel.navigateTo(navigateToGenerico, (games[index] as GenericoUi).id)}
                                 else -> {}
                             }
@@ -234,7 +234,7 @@ fun Games(modifier:Modifier = Modifier, games: List<Any>, onTap: (Int) -> Unit, 
 }
 @Composable
 fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int) -> Unit){
-    val border = if(game.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary
+    val border = if(game.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceDim
 //    val text = if(game.selected) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.onPrimary
 
     Card(
@@ -254,7 +254,7 @@ fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int)
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
-                .background(MaterialTheme.colorScheme.primaryContainer),
+                .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
 

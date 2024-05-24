@@ -61,6 +61,10 @@ android {
 }
 
 dependencies {
+
+    //Gson
+    implementation("com.google.code.gson:gson:2.11.0")
+
     //Room
     implementation("androidx.room:room-runtime:2.5.0")
     ksp("androidx.room:room-compiler:2.5.0")

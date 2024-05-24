@@ -9,26 +9,18 @@ data class GenericoUi(
     val id:Int = 0,
     val dataCreated: String = "",
     val selected:Boolean = false,
-    val pointLimit:Int = 30,
-    val player1: GenericoPlayerUi = GenericoPlayerUi("Nosotros"),
-    val player2: GenericoPlayerUi = GenericoPlayerUi("Ellos"),
-    val winner: TypePlayer = TypePlayer.VACIO
+
+    val withPoints:Boolean = false,
+    val pointToInit:Int = 0,
+    val pointToFinish:Int = 100,
+    val finishToWin:Boolean = true,
+
+    val withRounds:Boolean = false,
+    val round:Int = 10,
+
+    val playerMax:Int = 30,
+    val player:List<GenericoPlayerUi>
 ) {
-    fun resetPoint(point:Int) = this.copy(
-        pointLimit = point,
-        player1 = this.player1.setPoint(0),
-        player2 = this.player2.setPoint(0),
-        winner = TypePlayer.VACIO
-    )
-    fun clearWinner() = this.copy(
-        winner = TypePlayer.VACIO
-    )
-    fun setNamePlayer1(name:String) = this.copy(player1 = this.player1.setName(name))
-    fun increasePlayer1() = this.copy(player1 = this.player1.setPoint(this.player1.playerPoint.inc()))
-    fun decreasePlayer1() = this.copy(player1 = this.player1.setPoint(this.player1.playerPoint.dec()))
-    fun setNamePlayer2(name:String) = this.copy(player2 = this.player2.setName(name))
-    fun increasePlayer2() = this.copy(player2 = this.player2.setPoint(this.player2.playerPoint.inc()))
-    fun decreasePlayer2() = this.copy(player2 = this.player2.setPoint(this.player2.playerPoint.dec()))
 
 }
 
@@ -39,15 +31,20 @@ data class GenericoPlayerUi(
 ) {
     fun setName(name:String) = this.copy(playerName = name)
     fun setPoint(point:Int) = this.copy(playerPoint = point)
+    fun setVictories(victories:Int) = this.copy(victories = victories)
 }
 
 fun GenericoDomain.toUi() = GenericoUi(
     id = id,
     dataCreated = dataCreated,
-    pointLimit = pointLimit,
-    player1 = player1.toUi(),
-    player2 = player2.toUi(),
-    winner = winner,
+    withPoints = withPoints,
+    pointToInit = pointToInit,
+    pointToFinish = pointToFinish,
+    finishToWin = finishToWin,
+    withRounds = withRounds,
+    round = round,
+    playerMax = playerMax,
+    player = player.map { it.toUi() },
 )
 
 fun GenericoPlayerDomain.toUi() = GenericoPlayerUi(
