@@ -3,10 +3,11 @@ package com.example.yourpoints.data.database.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.yourpoints.domain.model.TrucoDomain
+import com.example.yourpoints.domain.model.GenericoDomain
 
-@Entity(tableName = "truco_table")
-data class TrucoEntity (
+
+@Entity(tableName = "generico_table")
+data class GenericoEntity(
     @PrimaryKey val id:Int,
     @ColumnInfo(name = "dataCreated") val dataCreated: String = "",
 
@@ -24,10 +25,10 @@ data class TrucoEntity (
 )
 
 
-fun TrucoDomain.toEntity() = TrucoEntity(
+fun GenericoDomain.toEntity() = GenericoEntity(
     id = id,
-    pointLimit = pointLimit,
     dataCreated = dataCreated,
+    pointLimit = pointLimit,
     playerName1 = player1.playerName,
     playerPoint1 = player1.playerPoint,
     victories1 = player1.victories,
@@ -36,3 +37,4 @@ fun TrucoDomain.toEntity() = TrucoEntity(
     victories2 = player2.victories,
     winner = 0,
 )
+

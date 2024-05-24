@@ -1,42 +1,43 @@
 package com.example.yourpoints.domain.model
 
-import com.example.yourpoints.data.database.entities.TrucoEntity
-import com.example.yourpoints.presentation.model.TrucoPlayerUi
-import com.example.yourpoints.presentation.model.TrucoUi
+import com.example.yourpoints.data.database.entities.GenericoEntity
+import com.example.yourpoints.presentation.model.GenericoPlayerUi
+import com.example.yourpoints.presentation.model.GenericoUi
 
-data class TrucoDomain (
+
+data class GenericoDomain (
     val id:Int,
-    val dataCreated:String,
     val pointLimit:Int,
-    val player1: TrucoPlayerDomain,
-    val player2: TrucoPlayerDomain,
+    val dataCreated:String,
+    val player1: GenericoPlayerDomain,
+    val player2: GenericoPlayerDomain,
     val winner: TypePlayer = TypePlayer.VACIO,
 )
 
-data class TrucoPlayerDomain(
+data class GenericoPlayerDomain(
     val playerName:String = "",
     val playerPoint:Int = 0,
     val victories:Int = 0
 )
 
 
-fun TrucoEntity.toDomain() = TrucoDomain(
+fun GenericoEntity.toDomain() = GenericoDomain(
     id = id,
-    dataCreated = dataCreated,
     pointLimit = pointLimit,
-    player1 = TrucoPlayerDomain(
+    dataCreated = dataCreated,
+    player1 = GenericoPlayerDomain(
         playerName = playerName1,
         playerPoint = playerPoint1,
         victories = victories1,
     ),
-    player2 = TrucoPlayerDomain(
+    player2 = GenericoPlayerDomain(
         playerName = playerName2,
         playerPoint = playerPoint2,
         victories = victories2,
     )
 )
 
-fun TrucoUi.toDomain() = TrucoDomain(
+fun GenericoUi.toDomain() = GenericoDomain(
     id = id,
     pointLimit = pointLimit,
     dataCreated = dataCreated,
@@ -45,10 +46,8 @@ fun TrucoUi.toDomain() = TrucoDomain(
     winner = winner
 )
 
-fun TrucoPlayerUi.toDomain() = TrucoPlayerDomain(
+fun GenericoPlayerUi.toDomain() = GenericoPlayerDomain(
     playerName = playerName,
     playerPoint = playerPoint,
     victories = victories,
 )
-
-

@@ -1,6 +1,7 @@
 package com.example.yourpoints.presentation.ui.home
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,18 +11,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -44,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.yourpoints.presentation.model.GenericoUi
 import com.example.yourpoints.presentation.model.TrucoUi
 
 private const val TAG = "HomeScreen Intern Test"
@@ -58,6 +64,8 @@ fun HomeScreen (
     var showDialog by remember{ mutableStateOf(false) }
     val uiState by homeViewModel.uiState.collectAsState()
     val games by homeViewModel.games.collectAsState()
+    val gameSelected by homeViewModel.gameSelected.collectAsState()
+
 
     Box (
         modifier = Modifier
@@ -69,16 +77,29 @@ fun HomeScreen (
         when(uiState){
             HomeViewState.LOADING -> Loading(Modifier.align(Alignment.Center))
             HomeViewState.SUCCESS -> {
-                Games(
-                    games,
-                    onClickGame = {id ->
-                        Log.i(TAG, "HomeScreen: Click Game $id")
-                        homeViewModel.navigateTo(navigateToTruco, id)
+                Body(
+                    modifier = Modifier.fillMaxSize(),
+                    games = games,
+                    gameSelected = gameSelected,
+                    onTap = {index ->
+                        if (gameSelected){
+                            Log.i(TAG, "HomeScreen: Selected Game $index")
+                            homeViewModel.selectGame(index)
+                        } else {
+                            Log.i(TAG, "HomeScreen: onJoinGame ${games[index]}")
+                            when(games[index]){
+                                is TrucoUi -> {homeViewModel.navigateTo(navigateToTruco, (games[index] as TrucoUi).id)}
+                                is GenericoUi -> {homeViewModel.navigateTo(navigateToGenerico, (games[index] as GenericoUi).id)}
+                                else -> {}
+                            }
+                        }
+                     },
+                    onLongPress = {index ->
+                        Log.i(TAG, "HomeScreen: Selected Game $index")
+                        homeViewModel.selectGame(index)
                     },
-                    onDeleteGame = {id ->
-                        Log.i(TAG, "HomeScreen: Delete Game $id")
-                        homeViewModel.deleteOldGame(id)
-                    }
+                    onSelectAllGames = {},
+                    onDeleteGames = {},
                 )
                 StartAnnotator(Modifier.align(Alignment.BottomEnd)){showDialog = true}
             }
@@ -115,27 +136,88 @@ fun Loading(modifier: Modifier) {
 }
 
 
-
+@Composable
+fun Body(
+    modifier: Modifier = Modifier,
+    games: List<Any>,
+    gameSelected:Boolean,
+    onTap: (Int) -> Unit,
+    onLongPress: (Int) -> Unit,
+    onSelectAllGames: () -> Unit,
+    onDeleteGames:() -> Unit
+){
+    Column(modifier = modifier) {
+        if (gameSelected){
+            OptionBar(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(75.dp),
+                onSelectAllGames = onSelectAllGames,
+                onDeleteGames = onDeleteGames
+            )
+        }
+        Games(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            games = games,
+            onTap = onTap,
+            onLongPress = onLongPress
+        )
+    }
+}
 
 @Composable
-fun Games(games: List<TrucoUi>, onClickGame: (Int) -> Unit, onDeleteGame:(Int) -> Unit) {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background), horizontalAlignment = Alignment.CenterHorizontally) {
+fun OptionBar(
+    modifier: Modifier = Modifier,
+    onSelectAllGames: () -> Unit,
+    onDeleteGames:() -> Unit
+){
+    Row (
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.primaryContainer),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ){
+        Spacer(modifier = Modifier.width(40.dp))
+        Text(
+            modifier = Modifier.clickable {
+                onSelectAllGames()
+            },
+            text = "Select All",
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            modifier = Modifier.clickable {
+                onDeleteGames()
+            },
+            text = "Delete",
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        Spacer(modifier = Modifier.width(40.dp))
+    }
+}
+
+@Composable
+fun Games(modifier:Modifier = Modifier, games: List<Any>, onTap: (Int) -> Unit, onLongPress:(Int) -> Unit) {
+    Column(modifier.background(MaterialTheme.colorScheme.background), horizontalAlignment = Alignment.CenterHorizontally) {
         if (games.isNotEmpty()) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(1),
                 content = {
-                    items(games.size) { game ->
-//                        when(game.){
-//
-//                        }
-                        ItemTruco(
-                            games[game],
-                            onClickGame = onClickGame,
-                            onDeleteGame = onDeleteGame
-                        )
+                    items(games.size) { index ->
+                        if (games[index] is TrucoUi){
+                            ItemTruco(
+                                index = index,
+                                game = games[index] as TrucoUi,
+                                onTap = onTap,
+                                onLongPress = onLongPress
+                            )
+                        } else {
+                            Log.i(TAG, "Games: ignorado")
+                            Log.i(TAG, "game: ${games[index]}")
+                        }
                     }
                 },
                 contentPadding = PaddingValues(16.dp)
@@ -145,25 +227,28 @@ fun Games(games: List<TrucoUi>, onClickGame: (Int) -> Unit, onDeleteGame:(Int) -
     }
 }
 @Composable
-fun ItemTruco(game: TrucoUi, onClickGame: (Int) -> Unit, onDeleteGame: (Int) -> Unit){
+fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int) -> Unit){
+    val border = if(game.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary
+//    val text = if(game.selected) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.onPrimary
+
     Card(
         modifier = Modifier
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onLongPress = { onDeleteGame(game.id) },
-                    onTap = { onClickGame(game.id) },
+                    onLongPress = { onLongPress(index) },
+                    onTap = { onTap(index) },
                 )
             }
             .clip(RoundedCornerShape(12.dp))
             .padding(horizontal = 16.dp)
             .padding(vertical = 8.dp)
-            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+            .border(2.dp, border, RoundedCornerShape(12.dp))
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
-                .background(MaterialTheme.colorScheme.background),
+                .background(MaterialTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center
         ) {
 

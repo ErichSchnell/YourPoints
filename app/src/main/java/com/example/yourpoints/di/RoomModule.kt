@@ -15,16 +15,20 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RoomModule {
 
-    private const val TRUCO_DATABASE_NAME = "truco_database"
+    private const val ANNOTATOR_DATABASE_NAME = "annotator_database"
 
 
     @Singleton
     @Provides
     fun provideRoom(@ApplicationContext context: Context): DatabaseService{
-        return Room.databaseBuilder(context, DatabaseService::class.java, TRUCO_DATABASE_NAME).build()
+        return Room.databaseBuilder(context, DatabaseService::class.java, ANNOTATOR_DATABASE_NAME).build()
     }
 
     @Singleton
     @Provides
     fun provideTrucoDao(db:DatabaseService) = db.getTrucoDao()
+
+    @Singleton
+    @Provides
+    fun provideGenericoDao(db:DatabaseService) = db.getGenericoDao()
 }
