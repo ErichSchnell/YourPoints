@@ -98,8 +98,14 @@ fun HomeScreen (
                         Log.i(TAG, "HomeScreen: Selected Game $index")
                         homeViewModel.selectGame(index)
                     },
-                    onSelectAllGames = {},
-                    onDeleteGames = {},
+                    onSelectAllGames = {
+                        Log.i(TAG, "HomeScreen: Select All game")
+                        homeViewModel.selectAll()
+                    },
+                    onDeleteGames = {
+                        Log.i(TAG, "HomeScreen: Select All game")
+                        homeViewModel.deleteGames()
+                    },
                 )
                 StartAnnotator(Modifier.align(Alignment.BottomEnd)){showDialog = true}
             }

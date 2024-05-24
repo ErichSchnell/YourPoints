@@ -42,7 +42,7 @@ class HomeViewModel @Inject constructor(
                     getGames().collect {
 
                         _games.value = it
-//                        _gameSelected.value = verifyGameSalected()
+                        _gameSelected.value = verifyGameSelected()
 
                         if (it.isNotEmpty()){
                             _uiState.value = HomeViewState.SUCCESS
@@ -60,16 +60,35 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun deleteOldGame(id: Int){
+    fun deleteGames(){
+        val gamesToDelete: MutableList<Any> = mutableListOf()
+        _games.value.forEach {
+            when(it){
+                is TrucoUi -> {
+                    if (it.selected) gamesToDelete.add(it)
+                }
+                is GenericoUi -> {
+                    if (it.selected) gamesToDelete.add(it)
+                }
+                else -> {
+
+                }
+            }
+        }
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    _games.value.forEach{
-                        if (it is TrucoUi && it.id == id){
-                            deleteGame(it.toDomain())
-                            //_gameSelected.value = verifyGameSalected()
+                    gamesToDelete.forEach{
+                        when(it) {
+                            is TrucoUi -> {
+                                deleteGame(it.toDomain())
+                            }
+                            is GenericoUi -> {
+                                //deleteGame(it.toDomain())
+                            }
                         }
                     }
+
                 } catch (e:Exception){
                     Log.i(TAG, "deleteOldGame: NO SE BORRO")
                     Log.i(TAG, "Error mensaje: ${e.message}")
@@ -97,6 +116,47 @@ class HomeViewModel @Inject constructor(
         _gameSelected.value = verifyGameSelected()
     }
 
+    fun selectAll() {
+        var sizeAux = 0
+
+        _games.value = _games.value.map {
+            when (it) {
+                is TrucoUi -> {
+                    if (!it.selected) {
+                        it.changeSelect()
+                    } else {
+                        sizeAux++
+                        it
+                    }
+                }
+                is GenericoUi -> {
+                    if (!it.selected) {
+                        //it.changeSelect()
+                        it
+                    } else {
+                        sizeAux++
+                        it
+                    }
+                }
+                else -> {}
+            }
+        }
+
+        if (_games.value.size == sizeAux) {
+            _games.value = _games.value.map {
+                when (it) {
+                    is TrucoUi -> it.changeSelect()
+
+                    is GenericoUi -> it
+
+                    else -> {}
+                }
+            }
+        }
+
+        _gameSelected.value = verifyGameSelected()
+    }
+
     fun navigateTo(navigateToAnnotator: (Int) -> Unit, id:Int = 0) {
         navigateToAnnotator(id)
     }
@@ -118,7 +178,6 @@ class HomeViewModel @Inject constructor(
         }
         return false
     }
-
 
 
 }
