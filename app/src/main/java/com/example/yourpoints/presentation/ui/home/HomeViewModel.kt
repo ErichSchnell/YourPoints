@@ -3,9 +3,9 @@ package com.example.yourpoints.presentation.ui.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yourpoints.domain.DeleteTrucoGameUseCase
+import com.example.yourpoints.domain.annotatorTruco.DeleteTrucoGameUseCase
 import com.example.yourpoints.domain.GetAllGamesUseCase
-import com.example.yourpoints.domain.UpdateTrucoGameUseCase
+import com.example.yourpoints.domain.annotatorTruco.UpdateTrucoGameUseCase
 import com.example.yourpoints.domain.model.toDomain
 import com.example.yourpoints.presentation.model.GenericoUi
 import com.example.yourpoints.presentation.model.TrucoUi
@@ -22,8 +22,7 @@ private const val TAG = "HomeViewModel Intern Test"
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getGames: GetAllGamesUseCase,
-    private val deleteGame: DeleteTrucoGameUseCase,
-    private val updateGame: UpdateTrucoGameUseCase
+    private val deleteGame: DeleteTrucoGameUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeViewState>(HomeViewState.LOADING)

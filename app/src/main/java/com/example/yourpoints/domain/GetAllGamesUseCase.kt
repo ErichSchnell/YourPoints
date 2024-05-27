@@ -8,6 +8,7 @@ import com.example.yourpoints.presentation.model.GenericoUi
 import com.example.yourpoints.presentation.model.TrucoUi
 import com.example.yourpoints.presentation.model.toUi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import javax.inject.Inject
@@ -19,7 +20,7 @@ class GetAllGamesUseCase @Inject constructor(
     operator fun invoke(): Flow<List<Any>> {
 
         val trucoGames = trucoRepository.getAllGames().map { item -> item.map { it.toUi() } }
-        val genericoGames = genericoRepository.getAllGames().map { item -> item.map { it.toUi() } }
+        val genericoGames = genericoRepository.getAllGames().map { item -> item.map { it.toUi() } } //:Flow<List<GenericoUi>> = flow<List<GenericoUi>> { emptyList<GenericoUi>() }
 
         val game = merge(trucoGames, genericoGames)
 

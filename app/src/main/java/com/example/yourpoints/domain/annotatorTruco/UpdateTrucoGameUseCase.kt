@@ -1,4 +1,4 @@
-package com.example.yourpoints.domain
+package com.example.yourpoints.domain.annotatorTruco
 
 import com.example.yourpoints.data.TrucoRepository
 import com.example.yourpoints.data.database.entities.toEntity

@@ -1,4 +1,4 @@
-package com.example.yourpoints.domain
+package com.example.yourpoints.domain.annotatorTruco
 
 import android.util.Log
 import com.example.yourpoints.data.TrucoRepository
@@ -9,8 +9,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-private const val TAG = "GetAllTrucoGameUseCase Intern Test"
 class GetAllTrucoGameUseCase @Inject constructor(private val trucoRepository: TrucoRepository) {
+
+    private val TAG = "GetAllTrucoGameUseCase Intern Test"
+
     operator fun invoke(): Flow<List<TrucoUi>> =  try {
         trucoRepository.getAllGames().map { item -> item.map { it.toUi() } }
     } catch (e: Exception) {

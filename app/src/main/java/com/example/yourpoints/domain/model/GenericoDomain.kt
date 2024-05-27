@@ -20,7 +20,7 @@ data class GenericoDomain (
     val round:Int,
 
     val playerMax:Int,
-    val player:List<GenericoPlayerDomain>
+    val player:MutableList<GenericoPlayerDomain> = mutableListOf()
 )
 
 data class GenericoPlayerDomain(
@@ -56,7 +56,7 @@ fun GenericoUi.toDomain() = GenericoDomain(
     withRounds = withRounds,
     round = round,
     playerMax = playerMax,
-    player = player.map { it.toDomain() },
+    player = player.map { it.toDomain() }.toMutableList(),
 )
 
 fun GenericoPlayerUi.toDomain() = GenericoPlayerDomain(

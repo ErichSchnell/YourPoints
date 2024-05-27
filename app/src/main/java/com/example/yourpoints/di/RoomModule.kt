@@ -2,6 +2,8 @@ package com.example.yourpoints.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.yourpoints.data.database.DatabaseService
 import com.example.yourpoints.data.database.dao.TrucoDao
 import dagger.Module
@@ -16,7 +18,6 @@ import javax.inject.Singleton
 object RoomModule {
 
     private const val ANNOTATOR_DATABASE_NAME = "annotator_database"
-
 
     @Singleton
     @Provides

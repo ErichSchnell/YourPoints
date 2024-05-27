@@ -3,9 +3,9 @@ package com.example.yourpoints.presentation.ui.truco
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yourpoints.domain.AddTrucoGameUseCase
-import com.example.yourpoints.domain.GetTrucoGameUseCase
-import com.example.yourpoints.domain.UpdateTrucoGameUseCase
+import com.example.yourpoints.domain.annotatorTruco.AddTrucoGameUseCase
+import com.example.yourpoints.domain.annotatorTruco.GetTrucoGameUseCase
+import com.example.yourpoints.domain.annotatorTruco.UpdateTrucoGameUseCase
 import com.example.yourpoints.domain.model.TypePlayer
 import com.example.yourpoints.domain.model.toDomain
 import com.example.yourpoints.presentation.model.TrucoUi
