@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GenericoDao {
-    @Query("select * from generico_table order by id desc")
+    @Query("select * from generico_table order by dataCreated desc")
     fun getGames(): Flow<List<GenericoEntity>>
 
     @Query("select * from generico_table where id = :id ")

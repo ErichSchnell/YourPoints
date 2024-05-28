@@ -1,7 +1,6 @@
 package com.example.yourpoints.presentation.ui.home
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -209,26 +209,29 @@ fun OptionBar(
 fun Games(modifier:Modifier = Modifier, games: List<Any>, onTap: (Int) -> Unit, onLongPress:(Int) -> Unit) {
     Column(modifier.background(MaterialTheme.colorScheme.background), horizontalAlignment = Alignment.CenterHorizontally) {
         if (games.isNotEmpty()) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(1),
-                content = {
-                    items(games.size) { index ->
-                        if (games[index] is TrucoUi){
-                            ItemTruco(
-                                index = index,
-                                game = games[index] as TrucoUi,
-                                onTap = onTap,
-                                onLongPress = onLongPress
-                            )
-                        } else {
-                            Log.i(TAG, "Games: ignorado")
-                            Log.i(TAG, "game: ${games[index]}")
-                        }
+            LazyColumn(){
+                Log.i(TAG, "Game.size: ${games.size}")
+                items(games.size) {index ->
+                    Log.i(TAG, "Game[$index]: ${games[index]}")
+                    if (games[index] is TrucoUi){
+                        ItemTruco(
+                            index = index,
+                            game = games[index] as TrucoUi,
+                            onTap = onTap,
+                            onLongPress = onLongPress
+                        )
+                    } else if (games[index] is GenericoUi){
+                        ItemGenerico(
+                            index = index,
+                            game = games[index] as GenericoUi,
+                            onTap = onTap,
+                            onLongPress = onLongPress
+                        )
+                    } else {
+                        Log.i(TAG, "Game ignorado")
                     }
-                },
-                contentPadding = PaddingValues(16.dp)
-            )
-
+                }
+            }
         }
     }
 }
@@ -280,6 +283,76 @@ fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int)
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
+                )
+            }
+
+            Text(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(8.dp),
+                text = game.dataCreated,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.tertiary,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+@Composable
+fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress: (Int) -> Unit){
+    val border = if(game.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceDim
+
+    Card(
+        modifier = Modifier
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = { onLongPress(index) },
+                    onTap = { onTap(index) },
+                )
+            }
+            .clip(RoundedCornerShape(12.dp))
+            .padding(horizontal = 16.dp)
+            .padding(vertical = 8.dp)
+            .border(2.dp, border, RoundedCornerShape(12.dp))
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+
+            Text(
+                modifier = Modifier.align(Alignment.TopCenter),
+                text = "Generico",
+                color = MaterialTheme.colorScheme.secondary,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+            )
+
+            Row( modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = game.id.toString(),
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = "Cant Players: ",
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = game.playerMax.toString(),
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    fontWeight = FontWeight.Bold
                 )
             }
 

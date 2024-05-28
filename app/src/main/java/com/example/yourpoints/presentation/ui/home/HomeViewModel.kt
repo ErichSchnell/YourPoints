@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yourpoints.domain.annotatorTruco.DeleteTrucoGameUseCase
-import com.example.yourpoints.domain.GetAllGamesUseCase
-import com.example.yourpoints.domain.annotatorTruco.UpdateTrucoGameUseCase
+import com.example.yourpoints.domain.annotatorGenerico.GetAllGenericoGameUseCase
+import com.example.yourpoints.domain.annotatorTruco.GetAllTrucoGameUseCase
 import com.example.yourpoints.domain.model.toDomain
 import com.example.yourpoints.presentation.model.GenericoUi
 import com.example.yourpoints.presentation.model.TrucoUi
@@ -21,7 +21,8 @@ private const val TAG = "HomeViewModel Intern Test"
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getGames: GetAllGamesUseCase,
+    private val getGamesTruco: GetAllTrucoGameUseCase,
+    private val getGamesGenerico: GetAllGenericoGameUseCase,
     private val deleteGame: DeleteTrucoGameUseCase
 ): ViewModel() {
 
@@ -31,16 +32,33 @@ class HomeViewModel @Inject constructor(
     private val _games = MutableStateFlow<List<Any>>( mutableListOf() )
     val games:StateFlow<List<Any>> = _games
 
+    private val _gamesTruco = MutableStateFlow<List<TrucoUi>>( mutableListOf() )
+
+    private val _gamesGenerico = MutableStateFlow<List<GenericoUi>>( mutableListOf() )
+
     private val _gameSelected = MutableStateFlow(false)
     val gameSelected:StateFlow<Boolean> = _gameSelected
 
     init {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                getTruco()
+                getGenerico()
+            }
+        }
+    }
+    fun getTruco(){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
                 try {
-                    getGames().collect {
+                    getGamesTruco().collect {
+                        Log.i(TAG, "getTruco: $it")
 
-                        _games.value = it
+                        _gamesTruco.value = it
+
+//                        actualizarGames()
+                        _games.value = _gamesTruco.value + _gamesGenerico.value
+
                         _gameSelected.value = verifyGameSelected()
 
                         if (it.isNotEmpty()){
@@ -54,10 +72,48 @@ class HomeViewModel @Inject constructor(
                     Log.i(TAG, "Error mensaje: ${e.message}")
                     _uiState.value = HomeViewState.ERROR
                 }
-
             }
         }
     }
+
+    fun getGenerico(){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    getGamesGenerico().collect {
+                        Log.i(TAG, "getGenerico: $it")
+
+                        _gamesGenerico.value = it
+
+                        _games.value = _gamesTruco.value + _gamesGenerico.value
+
+                        _gameSelected.value = verifyGameSelected()
+
+                        if (it.isNotEmpty()){
+                            _uiState.value = HomeViewState.SUCCESS
+                        } else {
+                            _uiState.value = HomeViewState.ERROR
+                        }
+                    }
+                } catch (e:Exception){
+                    Log.i(TAG, "Exploto todo ")
+                    Log.i(TAG, "Error mensaje: ${e.message}")
+                    _uiState.value = HomeViewState.ERROR
+                }
+            }
+        }
+    }
+
+//    private fun actualizarGames(){
+//        val gameAux = _gamesTruco.value + _gamesGenerico.value
+//        _games.value = ordenarGamesPorFecha(gameAux)
+//    }
+//    private fun ordenarGamesPorFecha(gameAux: List<Any>): List<Any> {
+//        gameAux.
+//
+//
+//        return
+//    }
 
     fun deleteGames(){
         val gamesToDelete: MutableList<Any> = mutableListOf()

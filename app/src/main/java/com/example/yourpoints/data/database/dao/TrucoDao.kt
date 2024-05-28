@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrucoDao {
-    @Query("select * from truco_table order by id desc")
+    @Query("select * from truco_table order by dataCreated desc")
     fun getGames(): Flow<List<TrucoEntity>>
 
     @Query("select * from truco_table where id = :id ")

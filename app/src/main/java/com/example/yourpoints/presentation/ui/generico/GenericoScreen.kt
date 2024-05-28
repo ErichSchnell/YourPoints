@@ -1,6 +1,5 @@
 package com.example.yourpoints.presentation.ui.generico
 
-import android.graphics.Color
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -14,12 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PlayArrow
@@ -29,9 +26,11 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -46,12 +45,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.yourpoints.R
 import com.example.yourpoints.presentation.model.GenericoPlayerUi
+import com.example.yourpoints.presentation.model.GenericoUi
 
 private val TAG = "GenericoScreen Intern Test"
 
@@ -88,14 +90,18 @@ fun GenericoScreen(
 
         GenericoUiState.SET_POINTS -> SetPoints(
             modifier = Modifier.fillMaxSize(),
-            cantPlayers = game.player,
+            players = game.player,
             onValueChange = {
                 genericoViewModel.updatePoints(it)
             }
         )
 
         GenericoUiState.VIEW_POINTS -> ViewPoints(
-
+            modifier = Modifier.fillMaxSize(),
+            game = game,
+            onClickViewChange = {
+                genericoViewModel.changeView()
+            }
         )
     }
 }
@@ -400,20 +406,20 @@ fun PrototypePlayer(
 @Composable
 fun SetPoints(
     modifier: Modifier = Modifier,
-    cantPlayers: List<GenericoPlayerUi>,
+    players: List<GenericoPlayerUi>,
     onValueChange: (List<Int>) -> Unit
 ){
     var index by remember { mutableStateOf(0) }
     val newPoints by remember { mutableStateOf(mutableListOf<Int>()) }
-    cantPlayers.forEach { newPoints.add(it.playerPoint) }
+    players.forEach { newPoints.add(it.playerPoint) }
 
     Column(modifier = modifier) {
-        cantPlayers.forEach{ player ->
+        players.forEach{ player ->
             ItemPlayer(
                 modifier = Modifier.fillMaxWidth(),
                 player = player,
                 onPointChahnge = {
-                    newPoints[cantPlayers.indexOf(player)] = it
+                    newPoints[players.indexOf(player)] = it
                 }
 
             )
@@ -480,19 +486,79 @@ fun ItemPlayer(
 
 
 @Composable
-fun ViewPoints(){
-//    Column(modifier = modifier) {
-//        Spacer(modifier = Modifier.weight(1f))
-//        FloatingActionButton(modifier = Modifier
-//            .padding(24.dp)
-//            .align(Alignment.End), onClick = { onValueChange(playerNames) }) {
-//            Icon(
-//                imageVector = Icons.Default.PlayArrow,
-//                contentDescription = null,
-//                modifier = Modifier.size(18.dp)
-//            )
-//        }
-//    }
+fun ViewPoints(
+    modifier: Modifier = Modifier,
+    game: GenericoUi,
+    onClickViewChange:() -> Unit
+){
+    Column(modifier = modifier) {
+        game.player.forEach {
+            ItemViewPlayer(
+                modifier = Modifier.fillMaxWidth(),
+                pointMax = game.pointToFinish,
+                player = it
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        FloatingActionButton(modifier = Modifier
+            .padding(24.dp)
+            .align(Alignment.End), onClick = { onClickViewChange() }) {
+            Icon(
+                imageVector = Icons.Default.PlayArrow,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+    }
+}
+@Composable
+fun ItemViewPlayer(
+    modifier:Modifier = Modifier,
+    pointMax: Int,
+    player:GenericoPlayerUi
+){
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+
+        Box(
+            Modifier
+                .clickable { }
+                .padding(8.dp)
+                .size(50.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = (player.playerPoint).toString(),
+                fontSize = 24.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+        }
+
+        Text(
+            text = player.playerName,
+            fontSize = 24.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+
+        LinearProgressIndicator(
+            progress = { ((player.playerPoint * 1f) / pointMax) },
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 24.dp, end = 12.dp),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.onPrimary,
+        )
+        Icon(
+            modifier = Modifier.size(50.dp),
+            painter = painterResource(id = R.drawable.meta_bandera),
+            contentDescription = "",
+            tint = MaterialTheme.colorScheme.primary
+        )
+
+    }
 }
 
 @Composable
