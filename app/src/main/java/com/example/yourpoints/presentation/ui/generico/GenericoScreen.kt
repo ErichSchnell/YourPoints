@@ -2,6 +2,7 @@ package com.example.yourpoints.presentation.ui.generico
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,13 +14,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -27,13 +34,15 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -415,7 +424,7 @@ fun SetPoints(
 
     Column(modifier = modifier) {
         players.forEach{ player ->
-            ItemPlayer(
+            ItemSetPoint(
                 modifier = Modifier.fillMaxWidth(),
                 player = player,
                 onPointChahnge = {
@@ -440,31 +449,23 @@ fun SetPoints(
     }
 }
 @Composable
-fun ItemPlayer(
+fun ItemSetPoint(
     modifier:Modifier = Modifier,
     player:GenericoPlayerUi,
     onPointChahnge:(Int) -> Unit
 ){
     var point by remember { mutableIntStateOf(0) }
 
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
 
-        Box(
-            Modifier
-                .clickable { }
-                .padding(8.dp)
-                .size(50.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = (player.playerPoint + point).toString(),
-                fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+        ScoreCircleBox(
+            modifier = Modifier.size(50.dp),
+            victories = player.victories,
+            score =  player.playerPoint + point,
+            victoriesVisibility = false
+        )
 
-        }
+        Spacer(modifier = Modifier.width(8.dp))
 
         Text(
             text = player.playerName,
@@ -473,7 +474,9 @@ fun ItemPlayer(
         )
 
         Spacer(modifier = Modifier.weight(1f))
+
         ChangeNumber(
+            modifier = Modifier.width(150.dp),
             value = point,
             onValueChange = {
                 point = it
@@ -493,131 +496,221 @@ fun ViewPoints(
 ){
     Column(modifier = modifier) {
         game.player.forEach {
-            ItemViewPlayer(
+            ItemViewPoint(
                 modifier = Modifier.fillMaxWidth(),
-                pointMax = game.pointToFinish,
+                game = game,
                 player = it
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-        FloatingActionButton(modifier = Modifier
-            .padding(24.dp)
-            .align(Alignment.End), onClick = { onClickViewChange() }) {
-            Icon(
-                imageVector = Icons.Default.PlayArrow,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
+        if (!game.finished){
+            FloatingActionButton(modifier = Modifier
+                .padding(24.dp)
+                .align(Alignment.End), onClick = { onClickViewChange() }) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        } else {
+            FloatingActionButton(modifier = Modifier
+                .padding(24.dp)
+                .align(Alignment.Start), onClick = { onClickViewChange() }) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
+
     }
 }
 @Composable
-fun ItemViewPlayer(
+fun ItemViewPoint(
     modifier:Modifier = Modifier,
-    pointMax: Int,
+    game: GenericoUi,
     player:GenericoPlayerUi
 ){
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier.padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
 
-        Box(
-            Modifier
-                .clickable { }
-                .padding(8.dp)
-                .size(50.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = (player.playerPoint).toString(),
-                fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+        ScoreCircleBox(
+            modifier = Modifier.size(50.dp),
+            finishToWin = game.finishToWin,
+            victoriesVisibility = game.withPoints,
+            victories = player.victories,
+            score =  player.playerPoint
+        )
+
+        Text(
+            modifier = Modifier.weight(0.5f),
+            text = player.playerName,
+            fontSize = 24.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+
+        if (game.withPoints){
+            LinearProgressIndicator(
+                progress = { ((player.playerPoint * 1f) / game.pointToFinish) },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 24.dp, end = 12.dp),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.onPrimary,
+            )
+
+            EmoticonPlayer(
+                modifier = Modifier.size(50.dp),
+                finishToWin = game.finishToWin,
+                pointToFinish = game.pointToFinish,
+                player = player,
+            )
+        } else {
+            Spacer(modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+fun ScoreCircleBox(
+    modifier: Modifier,
+    finishToWin: Boolean = true,
+    victoriesVisibility: Boolean = true,
+    victories: Int,
+    score: Int,
+) {
+    BadgedBox(
+        badge = {
+            if (victoriesVisibility) {// && victories > 0
+                BadgedBoxScore(victories, finishToWin)
+            }
+        },
+        content = {
+            Box(
+                modifier
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = score.toString(),
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    )
+}
+
+@Composable
+fun BadgedBoxScore(victories: Int, finishToWin: Boolean) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(text = "$victories", fontSize = 16.sp)
+        Image(
+            modifier = Modifier.size(16.dp),
+            painter = if (finishToWin) painterResource(id = R.drawable.cup_winner) else painterResource(id = R.drawable.sad_loser),
+            contentDescription = "",
+        )
+    }
+}
+
+@Composable
+fun EmoticonPlayer(
+    modifier: Modifier = Modifier,
+    finishToWin: Boolean,
+    pointToFinish: Int,
+    player: GenericoPlayerUi,
+) {
+
+    if(player.playerPoint >= pointToFinish){
+        if (finishToWin){
+            Image(
+                modifier = modifier,
+                painter = painterResource(id = R.drawable.cup_winner),
+                contentDescription = "",
+            )
+        } else {
+            Image(
+                modifier = modifier,
+                painter = painterResource(id = R.drawable.sad_loser),
+                contentDescription = "",
             )
 
         }
-
-        Text(
-            text = player.playerName,
-            fontSize = 24.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-
-        LinearProgressIndicator(
-            progress = { ((player.playerPoint * 1f) / pointMax) },
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 24.dp, end = 12.dp),
-            color = MaterialTheme.colorScheme.primary,
-            trackColor = MaterialTheme.colorScheme.onPrimary,
-        )
+    } else {
         Icon(
-            modifier = Modifier.size(50.dp),
-            painter = painterResource(id = R.drawable.meta_bandera),
+            modifier = modifier,
+            painter = painterResource(id = R.drawable.flag_finish),
             contentDescription = "",
             tint = MaterialTheme.colorScheme.primary
         )
-
     }
+
+
 }
 
 @Composable
 fun ChangeNumber(
     modifier: Modifier = Modifier,
-    title:String = "",
-    value:Int,
+    title:String? = null,
+    value:Int = 0,
     onValueChange: (Int) -> Unit
 ){
     var numberAux by remember { mutableStateOf(value.toString()) }
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-        Text(modifier = Modifier.fillMaxWidth(), text = title, textAlign = TextAlign.Center)
-
-        Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 12.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ){
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Icon(
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable {
-                        numberAux = value.toString()
-                        onValueChange(value.dec())
-                    },
-                tint = MaterialTheme.colorScheme.tertiary, imageVector = Icons.Default.KeyboardArrowDown, contentDescription = ""
-            )
-            Spacer(modifier = Modifier.weight(1f))
-
-            TextField(
-                value = numberAux, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                onValueChange = {
-                    numberAux = it
-                    try {
-                        onValueChange(it.toInt())
-                    } catch (e:Exception){
-                        Log.i(TAG, "ChangeNumber error: ${e.message}")
-                    }
-                }
-            )
-            Spacer(modifier = Modifier.weight(1f))
-
-            Icon(
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable {
-                        numberAux = value.toString()
-                        onValueChange(value.inc())
-                    },
-                tint = MaterialTheme.colorScheme.tertiary, imageVector = Icons.Default.KeyboardArrowUp, contentDescription = ""
-            )
-            Spacer(modifier = Modifier.weight(1f))
+        title?.let {
+            Text(modifier = Modifier.fillMaxWidth(), text = it, textAlign = TextAlign.Center)
         }
+
+        TextField(
+            modifier = Modifier.wrapContentWidth(),
+            value = numberAux,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            onValueChange = {
+                numberAux = it
+                try {
+                    onValueChange(it.toInt())
+                } catch (e:Exception){
+                    Log.i(TAG, "ChangeNumber error: ${e.message}")
+                }
+            },
+            leadingIcon = {
+                Icon(
+                    modifier = Modifier
+                        .clickable {
+                            numberAux = value.dec().toString()
+                            onValueChange(value.dec())
+                        },
+                    tint = MaterialTheme.colorScheme.tertiary, imageVector = Icons.Default.KeyboardArrowDown, contentDescription = ""
+                )
+            },
+            trailingIcon = {
+                Icon(
+                    modifier = Modifier
+                        .clickable {
+                            numberAux = value.inc().toString()
+                            onValueChange(value.inc())
+                        },
+                    tint = MaterialTheme.colorScheme.tertiary, imageVector = Icons.Default.KeyboardArrowUp, contentDescription = ""
+                )
+            },
+            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+            singleLine =  true,
+            colors =  TextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+            ),
+        )
     }
 }
 

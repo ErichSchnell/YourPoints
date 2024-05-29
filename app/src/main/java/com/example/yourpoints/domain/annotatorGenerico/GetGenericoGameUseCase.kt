@@ -2,9 +2,7 @@ package com.example.yourpoints.domain.annotatorGenerico
 
 import android.util.Log
 import com.example.yourpoints.data.GenericoRepository
-import com.example.yourpoints.data.TrucoRepository
 import com.example.yourpoints.presentation.model.GenericoUi
-import com.example.yourpoints.presentation.model.TrucoUi
 import com.example.yourpoints.presentation.model.toUi
 import javax.inject.Inject
 

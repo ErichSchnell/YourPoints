@@ -3,6 +3,7 @@ package com.example.yourpoints.presentation.ui.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.yourpoints.domain.annotatorGenerico.DeleteGenericoGameUseCase
 import com.example.yourpoints.domain.annotatorTruco.DeleteTrucoGameUseCase
 import com.example.yourpoints.domain.annotatorGenerico.GetAllGenericoGameUseCase
 import com.example.yourpoints.domain.annotatorTruco.GetAllTrucoGameUseCase
@@ -23,7 +24,8 @@ private const val TAG = "HomeViewModel Intern Test"
 class HomeViewModel @Inject constructor(
     private val getGamesTruco: GetAllTrucoGameUseCase,
     private val getGamesGenerico: GetAllGenericoGameUseCase,
-    private val deleteGame: DeleteTrucoGameUseCase
+    private val deleteTrucoGame: DeleteTrucoGameUseCase,
+    private val deleteGenericoGame: DeleteGenericoGameUseCase,
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeViewState>(HomeViewState.LOADING)
@@ -136,10 +138,10 @@ class HomeViewModel @Inject constructor(
                     gamesToDelete.forEach{
                         when(it) {
                             is TrucoUi -> {
-                                deleteGame(it.toDomain())
+                                deleteTrucoGame(it.toDomain())
                             }
                             is GenericoUi -> {
-                                //deleteGame(it.toDomain())
+                                deleteGenericoGame(it.toDomain())
                             }
                         }
                     }
@@ -160,7 +162,9 @@ class HomeViewModel @Inject constructor(
                         Log.i(TAG, "selectGame: $it")
                         it.changeSelect()
                     }
-                    is GenericoUi -> { it }
+                    is GenericoUi -> {
+                        Log.i(TAG, "selectGame: $it")
+                        it.changeSelect() }
                     else -> {}
                 }
             } else {
@@ -186,8 +190,7 @@ class HomeViewModel @Inject constructor(
                 }
                 is GenericoUi -> {
                     if (!it.selected) {
-                        //it.changeSelect()
-                        it
+                        it.changeSelect()
                     } else {
                         sizeAux++
                         it
@@ -202,7 +205,7 @@ class HomeViewModel @Inject constructor(
                 when (it) {
                     is TrucoUi -> it.changeSelect()
 
-                    is GenericoUi -> it
+                    is GenericoUi -> it.changeSelect()
 
                     else -> {}
                 }

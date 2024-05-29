@@ -2,6 +2,13 @@ package com.example.yourpoints.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+
+val colorWinner = Color(0xFF7EE780)
+val colorLoser = Color(0xFFFF75A4)
+val colorPlayer = Color(0xFFFFEB3B)
+
+
+
 val primaryLight = Color(0xFF006B5F)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFF9EF2E2)

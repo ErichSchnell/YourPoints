@@ -14,6 +14,7 @@ data class GenericoUi(
     val pointToInit:Int = 0,
     val pointToFinish:Int = 100,
     val finishToWin:Boolean = true,
+    val finished:Boolean = false,
 
     val withRounds:Boolean = false,
     val round:Int = 10,
@@ -21,6 +22,9 @@ data class GenericoUi(
     val playerMax:Int = 30,
     val player:MutableList<GenericoPlayerUi> = mutableListOf()
 ) {
+    fun changeSelect() = this.copy(
+        selected = !selected
+    )
 
 }
 
@@ -31,7 +35,7 @@ data class GenericoPlayerUi(
 ) {
     fun setName(name:String) = this.copy(playerName = name)
     fun setPoint(point:Int) = this.copy(playerPoint = point)
-    fun setVictories(victories:Int) = this.copy(victories = victories)
+    fun setVictories(victories:Int = this.victories.inc()) = this.copy(victories = victories)
 }
 
 fun GenericoDomain.toUi() = GenericoUi(

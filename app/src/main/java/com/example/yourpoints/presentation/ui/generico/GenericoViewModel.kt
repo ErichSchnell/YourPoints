@@ -38,7 +38,23 @@ class GenericoViewModel @Inject constructor(
         if (gameId == 0){
             _uiState.value = GenericoUiState.CREATE
         } else {
-            _uiState.value = GenericoUiState.VIEW_POINTS
+            getGenericoGame(gameId)
+        }
+    }
+
+    fun getGenericoGame(gameId: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    _game.value = getGame(gameId)
+                    Log.i(TAG, "Partida Encontrada. ID:$gameId")
+                    _uiState.value = GenericoUiState.VIEW_POINTS
+
+                } catch (e:Exception){
+                    Log.i(TAG, "Partida No Encontrada. ID:$gameId")
+                    Log.i(TAG, "Error mensaje: ${e.message}")
+                }
+            }
         }
     }
 
@@ -110,7 +126,7 @@ class GenericoViewModel @Inject constructor(
                 try {
                     updateGame(_game.value.toDomain())
 
-                    Log.i(TAG, "updateGame: listorti")
+                    Log.i(TAG, "updateGame names: listorti")
                     Log.i(TAG, "_game.value: ${_game.value}")
 
                     _uiState.value = GenericoUiState.VIEW_POINTS
@@ -127,27 +143,45 @@ class GenericoViewModel @Inject constructor(
     }
 
     fun updatePoints(points: List<Int>) {
+
+        val playersAux = mutableListOf<GenericoPlayerUi>()
+        for (i in points.indices){
+            playersAux.add(_game.value.player[i].setPoint(points[i]))
+        }
+
+        if (_game.value.withPoints){
+            for (i in points.indices){
+                if (
+                    playersAux[i].playerPoint >= _game.value.pointToFinish &&
+                    playersAux[i].playerPoint != _game.value.player[i].playerPoint
+                ){
+                    playersAux[i] = playersAux[i].setVictories()
+                }
+            }
+        }
+
         _game.value = _game.value.copy(
-            player = _game.value.player.map {item -> item.copy( playerPoint = points[_game.value.player.indexOf(item)])}.toMutableList()
+            player = playersAux
         )
+
+        updateGenericoGame()
+    }
+    fun updateGenericoGame(){
+        Log.i(TAG, "updateGenericoGame: listorti")
 
         viewModelScope.launch {
             withContext(Dispatchers.IO){
                 try {
                     updateGame(_game.value.toDomain())
-
-                    Log.i(TAG, "updateGame: listorti")
-                    Log.i(TAG, "_game.value: ${_game.value}")
-
                     _uiState.value = GenericoUiState.VIEW_POINTS
                 } catch (e:Exception){
-                    Log.i(TAG, "updateGame room: No se actualizo game")
-                    Log.i(TAG, "updateGame error: ${e.message}")
-
+                    Log.i(TAG, "updateGenericoGame room: No se actualizo game")
+                    Log.i(TAG, "updateGenericoGame error: ${e.message}")
                 }
             }
         }
     }
+
 
     fun changeView() {
         _uiState.value = GenericoUiState.SET_POINTS
