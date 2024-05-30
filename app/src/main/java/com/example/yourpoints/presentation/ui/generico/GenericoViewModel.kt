@@ -86,7 +86,7 @@ class GenericoViewModel @Inject constructor(
             pointToFinish = pointFinish,
             finishToWin = finishToWin,
             withRounds = roundFlag,
-            round = rounds,
+            roundMax = rounds,
             playerMax = cantPlayers,
             player = players
         )
@@ -111,69 +111,81 @@ class GenericoViewModel @Inject constructor(
 
     fun updateNames(names: List<String>) {
         var index = 0
-        val playerAux: MutableList<GenericoPlayerUi> = mutableListOf()
-        names.forEach{
-            playerAux.add(_game.value.player[index].copy(playerName = names[index]))
-            index++
-        }
 
-        _game.value = _game.value.copy(
-            player = playerAux
+        _game.value = _game.value.setPlayers(
+            _game.value.player.map { it.setName(names[index++]) }
         )
 
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                try {
-                    updateGame(_game.value.toDomain())
-
-                    Log.i(TAG, "updateGame names: listorti")
-                    Log.i(TAG, "_game.value: ${_game.value}")
-
-                    _uiState.value = GenericoUiState.VIEW_POINTS
-                } catch (e:Exception){
-                    Log.i(TAG, "updateGame room: No se actualizo game")
-                    Log.i(TAG, "updateGame error: ${e.message}")
-
-                }
-            }
-        }
-
-
-
+        updateRoomGame()
     }
 
     fun updatePoints(points: List<Int>) {
 
-        val playersAux = mutableListOf<GenericoPlayerUi>()
-        for (i in points.indices){
-            playersAux.add(_game.value.player[i].setPoint(points[i]))
-        }
+        _uiState.value = GenericoUiState.VIEW_POINTS
 
-        if (_game.value.withPoints){
-            for (i in points.indices){
-                if (
-                    playersAux[i].playerPoint >= _game.value.pointToFinish &&
-                    playersAux[i].playerPoint != _game.value.player[i].playerPoint
-                ){
-                    playersAux[i] = playersAux[i].setVictories()
-                }
-            }
-        }
-
-        _game.value = _game.value.copy(
-            player = playersAux
+        var index = 0
+        _game.value = _game.value.setPlayers(
+            players = _game.value.player.map { it.setPoint(points[index++])}
         )
 
-        updateGenericoGame()
+        verifyPlayerReachedGoal()
+
+
+
+//        val playersAux = mutableListOf<GenericoPlayerUi>()
+//        for (i in points.indices){
+//            playersAux.add(_game.value.player[i].setPoint(points[i]))
+//        }
+//
+//        if (_game.value.withPoints){
+//            for (i in points.indices){
+//                if(_game.value.player[i].playerPoint < _game.value.pointToFinish){
+//                    if (playersAux[i].playerPoint >= _game.value.pointToFinish){
+//                        playersAux[i] = playersAux[i].setVictories(playersAux[i].victories.inc())
+//                        _game.value = _game.value.setFinish(true)
+//                    }
+//                } else {
+//                    if (playersAux[i].playerPoint < _game.value.pointToFinish){
+//                        playersAux[i] = playersAux[i].setVictories(playersAux[i].victories.dec())
+//                        _game.value = _game.value.setFinish(false)
+//                    }
+//                }
+//            }
+//        }
+//
+//        _game.value = _game.value.copy(
+//            player = playersAux
+//        )
+
+        updateRoomGame()
     }
-    fun updateGenericoGame(){
+    private fun verifyPlayerReachedGoal(){
+        var gameFinished:Boolean = _game.value.finished
+        if (_game.value.withPoints){
+            _game.value = _game.value.setPlayers(
+                players = _game.value.player.map {
+                    if(it.playerPoint >= _game.value.pointToFinish && it.addVictoryFlag){
+                        gameFinished = true
+                        it.addVictories().setAddVictoryFlag(false)
+                    } else {
+                        if (it.playerPoint < _game.value.pointToFinish && !it.addVictoryFlag){
+                            it.lessVictories().setAddVictoryFlag(true)
+                        } else {
+                            it
+                        }
+                    }
+                }
+            )
+        }
+        _game.value = _game.value.setFinish(gameFinished)
+    }
+    private fun updateRoomGame(){
         Log.i(TAG, "updateGenericoGame: listorti")
 
         viewModelScope.launch {
             withContext(Dispatchers.IO){
                 try {
                     updateGame(_game.value.toDomain())
-                    _uiState.value = GenericoUiState.VIEW_POINTS
                 } catch (e:Exception){
                     Log.i(TAG, "updateGenericoGame room: No se actualizo game")
                     Log.i(TAG, "updateGenericoGame error: ${e.message}")
@@ -185,6 +197,11 @@ class GenericoViewModel @Inject constructor(
 
     fun changeView() {
         _uiState.value = GenericoUiState.SET_POINTS
+    }
+
+    fun resetGame() {
+        _game.value = _game.value.resetGame()
+        updateRoomGame()
     }
 }
 

@@ -54,7 +54,7 @@ fun GenericoUi.toDomain() = GenericoDomain(
     pointToFinish = pointToFinish,
     finishToWin = finishToWin,
     withRounds = withRounds,
-    round = round,
+    round = roundMax,
     playerMax = playerMax,
     player = player.map { it.toDomain() }.toMutableList(),
 )

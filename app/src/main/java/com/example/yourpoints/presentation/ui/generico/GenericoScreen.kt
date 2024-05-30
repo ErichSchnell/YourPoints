@@ -10,16 +10,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -32,6 +34,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalTextStyle
@@ -41,7 +44,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -64,7 +66,7 @@ import com.example.yourpoints.R
 import com.example.yourpoints.presentation.model.GenericoPlayerUi
 import com.example.yourpoints.presentation.model.GenericoUi
 
-private val TAG = "GenericoScreen Intern Test"
+private const val TAG = "GenericoScreen Intern Test"
 
 @Composable
 fun GenericoScreen(
@@ -99,7 +101,7 @@ fun GenericoScreen(
 
         GenericoUiState.SET_POINTS -> SetPoints(
             modifier = Modifier.fillMaxSize(),
-            players = game.player,
+            game = game,
             onValueChange = {
                 genericoViewModel.updatePoints(it)
             }
@@ -110,6 +112,9 @@ fun GenericoScreen(
             game = game,
             onClickViewChange = {
                 genericoViewModel.changeView()
+            },
+            onClickResetGame = {
+                genericoViewModel.resetGame()
             }
         )
     }
@@ -415,25 +420,32 @@ fun PrototypePlayer(
 @Composable
 fun SetPoints(
     modifier: Modifier = Modifier,
-    players: List<GenericoPlayerUi>,
+    game: GenericoUi,
     onValueChange: (List<Int>) -> Unit
 ){
-    var index by remember { mutableStateOf(0) }
-    val newPoints by remember { mutableStateOf(mutableListOf<Int>()) }
-    players.forEach { newPoints.add(it.playerPoint) }
+
+    val newPoints by remember { mutableStateOf( mutableListOf<Int>() ) }
+
+    game.player.forEach {
+        newPoints.add(it.playerPoint)
+    }
 
     Column(modifier = modifier) {
-        players.forEach{ player ->
+
+        game.player.forEach{ player ->
             ItemSetPoint(
                 modifier = Modifier.fillMaxWidth(),
+                game = game,
                 player = player,
                 onPointChahnge = {
-                    newPoints[players.indexOf(player)] = it
+                    newPoints[game.player.indexOf(player)] = it
                 }
-
             )
+            HorizontalDivider()
         }
+
         Spacer(modifier = Modifier.weight(1f))
+
         FloatingActionButton(modifier = Modifier
             .padding(24.dp)
             .align(Alignment.End), onClick = {
@@ -451,6 +463,7 @@ fun SetPoints(
 @Composable
 fun ItemSetPoint(
     modifier:Modifier = Modifier,
+    game:GenericoUi,
     player:GenericoPlayerUi,
     onPointChahnge:(Int) -> Unit
 ){
@@ -462,21 +475,26 @@ fun ItemSetPoint(
             modifier = Modifier.size(50.dp),
             victories = player.victories,
             score =  player.playerPoint + point,
-            victoriesVisibility = false
+            victoriesVisibility = game.withPoints,
+            finishToWin = game.finishToWin,
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
         Text(
+            modifier = Modifier.width(100.dp),
             text = player.playerName,
             fontSize = 24.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
         )
 
         Spacer(modifier = Modifier.weight(1f))
 
         ChangeNumber(
-            modifier = Modifier.width(150.dp),
+            modifier = Modifier
+                .height(50.dp)
+                .width(150.dp),
             value = point,
             onValueChange = {
                 point = it
@@ -492,39 +510,47 @@ fun ItemSetPoint(
 fun ViewPoints(
     modifier: Modifier = Modifier,
     game: GenericoUi,
-    onClickViewChange:() -> Unit
+    onClickViewChange:() -> Unit,
+    onClickResetGame:() -> Unit,
 ){
     Column(modifier = modifier) {
+
         game.player.forEach {
             ItemViewPoint(
                 modifier = Modifier.fillMaxWidth(),
                 game = game,
                 player = it
             )
+            HorizontalDivider()
         }
+
         Spacer(modifier = Modifier.weight(1f))
-        if (!game.finished){
-            FloatingActionButton(modifier = Modifier
-                .padding(24.dp)
-                .align(Alignment.End), onClick = { onClickViewChange() }) {
+
+
+        Row(Modifier.fillMaxWidth().padding(24.dp)) {
+            if (game.finished){
+                FloatingActionButton(
+                    onClick = { onClickResetGame() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            FloatingActionButton(
+                onClick = { onClickViewChange() }) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
             }
-        } else {
-            FloatingActionButton(modifier = Modifier
-                .padding(24.dp)
-                .align(Alignment.Start), onClick = { onClickViewChange() }) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
         }
-
     }
 }
 @Composable
@@ -533,10 +559,7 @@ fun ItemViewPoint(
     game: GenericoUi,
     player:GenericoPlayerUi
 ){
-    Row(
-        modifier = modifier.padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    Row(modifier = modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
 
         ScoreCircleBox(
             modifier = Modifier.size(50.dp),
@@ -546,8 +569,10 @@ fun ItemViewPoint(
             score =  player.playerPoint
         )
 
+        Spacer(modifier = Modifier.width(8.dp))
+
         Text(
-            modifier = Modifier.weight(0.5f),
+            modifier = Modifier.width(100.dp),
             text = player.playerName,
             fontSize = 24.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
