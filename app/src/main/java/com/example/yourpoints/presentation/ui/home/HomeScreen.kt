@@ -411,7 +411,7 @@ fun DialogSelectAnnotator(
         ) {
             Annotator(text = "GENERICO")  {onClickAnnotatorGenerico()}
             Annotator(text = "TRUCO") {onClickAnnotatorTruco()}
-            Annotator(text = "GENERALA") {onClickAnnotatorGenerala()}
+            //Annotator(text = "GENERALA") {onClickAnnotatorGenerala()}
         }
     }
 }

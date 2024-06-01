@@ -31,32 +31,29 @@ class TrucoViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<TrucoViewState>(TrucoViewState.LOADING)
     val uiState: StateFlow<TrucoViewState> = _uiState
 
-    private val _game = MutableStateFlow<TrucoUi>(TrucoUi())
+    private val _game = MutableStateFlow(TrucoUi())
     val game: StateFlow<TrucoUi> = _game
 
     private val _id = MutableStateFlow(0)
 
-    init {
-        _uiState.value = TrucoViewState.LOADING
-    }
-
-
     fun initAnnotator(gameId: Int) {
         if (gameId == 0){
-            addNewGame(getDate())
+            _uiState.value = TrucoViewState.CREATE
         } else {
-            _id.value = gameId
-            loadGame()
+            loadGame(gameId)
         }
     }
 
-    private fun addNewGame(date: String) {
+    fun addNewGame(pointMax: Int) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    _id.value = date.hashCode()
-                    setGame(TrucoUi(id = _id.value, dataCreated = date).toDomain())
-                    loadGame()
+                    val date = getDate()
+
+                    _game.value = TrucoUi(id = date.hashCode(), dataCreated = date, pointLimit = pointMax)
+                    setGame(_game.value.toDomain())
+
+                    _uiState.value = TrucoViewState.SUCCESS
                     Log.i(TAG, "Partida Inicializada. ID:${_id.value}")
                 } catch (e:Exception){
                     Log.i(TAG, "Partida No Inicializada. ID:${_id.value}")
@@ -65,16 +62,16 @@ class TrucoViewModel @Inject constructor(
             }
         }
     }
-    private fun loadGame(){
+    private fun loadGame(gameId: Int) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    _game.value = getGame(_id.value)
-                    Log.i(TAG, "Partida Encontrada. ID:${_id.value}")
+                    _game.value = getGame(gameId)
+                    Log.i(TAG, "Partida Encontrada. ID:$gameId")
                     _uiState.value = TrucoViewState.SUCCESS
 
                 } catch (e:Exception){
-                    Log.i(TAG, "Partida No Encontrada. ID:${_id.value}")
+                    Log.i(TAG, "Partida No Encontrada. ID:$gameId")
                     Log.i(TAG, "Error mensaje: ${e.message}")
                 }
             }
@@ -166,5 +163,6 @@ class TrucoViewModel @Inject constructor(
 
 sealed class TrucoViewState(){
     object LOADING: TrucoViewState()
+    object CREATE: TrucoViewState()
     object SUCCESS: TrucoViewState()
 }

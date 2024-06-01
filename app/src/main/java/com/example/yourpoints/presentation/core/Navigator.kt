@@ -11,7 +11,6 @@ import com.example.yourpoints.presentation.core.Routes.*
 import com.example.yourpoints.presentation.ui.generico.GenericoScreen
 import com.example.yourpoints.presentation.ui.home.HomeScreen
 import com.example.yourpoints.presentation.ui.truco.TrucoScreen
-import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "Navigator Intern Test"
 
@@ -40,7 +39,8 @@ fun ContentWrapper(navigatonController: NavHostController) {
             Truco.route, arguments = listOf(navArgument("gameId") { type = NavType.IntType })
         ) {
             TrucoScreen(
-                gameId = it.arguments?.getInt("gameId") ?: 0
+                gameId = it.arguments?.getInt("gameId") ?: 0,
+                navController = navigatonController
             )
         }
         composable(

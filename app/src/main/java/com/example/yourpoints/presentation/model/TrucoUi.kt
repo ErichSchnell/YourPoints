@@ -8,7 +8,7 @@ data class TrucoUi(
     val id:Int = 0,
     val selected:Boolean = false,
     val dataCreated: String = "",
-    val pointLimit:Int = 30,
+    val pointLimit:Int = 0,
     val player1: TrucoPlayerUi = TrucoPlayerUi("Nosotros"),
     val player2: TrucoPlayerUi = TrucoPlayerUi("Ellos"),
     val winner: TypePlayer = TypePlayer.VACIO

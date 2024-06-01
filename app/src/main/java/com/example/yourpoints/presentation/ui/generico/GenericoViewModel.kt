@@ -116,46 +116,21 @@ class GenericoViewModel @Inject constructor(
             _game.value.player.map { it.setName(names[index++]) }
         )
 
+        _uiState.value = GenericoUiState.VIEW_POINTS
+
         updateRoomGame()
     }
 
     fun updatePoints(points: List<Int>) {
-
-        _uiState.value = GenericoUiState.VIEW_POINTS
 
         var index = 0
         _game.value = _game.value.setPlayers(
             players = _game.value.player.map { it.setPoint(points[index++])}
         )
 
+        _uiState.value = GenericoUiState.VIEW_POINTS
+
         verifyPlayerReachedGoal()
-
-
-
-//        val playersAux = mutableListOf<GenericoPlayerUi>()
-//        for (i in points.indices){
-//            playersAux.add(_game.value.player[i].setPoint(points[i]))
-//        }
-//
-//        if (_game.value.withPoints){
-//            for (i in points.indices){
-//                if(_game.value.player[i].playerPoint < _game.value.pointToFinish){
-//                    if (playersAux[i].playerPoint >= _game.value.pointToFinish){
-//                        playersAux[i] = playersAux[i].setVictories(playersAux[i].victories.inc())
-//                        _game.value = _game.value.setFinish(true)
-//                    }
-//                } else {
-//                    if (playersAux[i].playerPoint < _game.value.pointToFinish){
-//                        playersAux[i] = playersAux[i].setVictories(playersAux[i].victories.dec())
-//                        _game.value = _game.value.setFinish(false)
-//                    }
-//                }
-//            }
-//        }
-//
-//        _game.value = _game.value.copy(
-//            player = playersAux
-//        )
 
         updateRoomGame()
     }

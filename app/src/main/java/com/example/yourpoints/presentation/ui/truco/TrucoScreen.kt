@@ -1,6 +1,6 @@
 package com.example.yourpoints.presentation.ui.truco
 
-import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,10 +52,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.yourpoints.R
 import com.example.yourpoints.domain.model.TypePlayer
 import com.example.yourpoints.presentation.model.TrucoUi
 import com.example.yourpoints.presentation.ui.theme.string_cancel
+import com.example.yourpoints.presentation.ui.theme.string_create
+import com.example.yourpoints.presentation.ui.theme.string_create_game
 import com.example.yourpoints.presentation.ui.theme.string_reset
 import com.example.yourpoints.presentation.ui.theme.string_restar_point
 import com.example.yourpoints.presentation.ui.theme.string_setting_points
@@ -63,9 +67,9 @@ import com.example.yourpoints.presentation.ui.theme.string_winner_game
 @Composable
 fun TrucoScreen(
     trucoViewModel: TrucoViewModel = hiltViewModel(),
-    gameId:Int
+    gameId: Int,
+    navController: NavHostController
 ){
-
     LaunchedEffect(true){
         trucoViewModel.initAnnotator(gameId)
     }
@@ -78,7 +82,14 @@ fun TrucoScreen(
     var showChangeNamePlayer2 by remember{ mutableStateOf(false) }
 
     when(uiState){
-        TrucoViewState.LOADING -> Loading(Modifier.fillMaxSize())
+        TrucoViewState.LOADING -> { Loading(modifier = Modifier.fillMaxSize())}
+        TrucoViewState.CREATE -> {
+            SettingNewGame(
+                onDismissRequest = { navController.popBackStack() },
+                onClickCancel = { navController.popBackStack() },
+                onClickCreate = { trucoViewModel.addNewGame(it) }
+            )
+        }
         TrucoViewState.SUCCESS -> {
             Box (modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
 
@@ -356,7 +367,61 @@ fun RestarPuntos(
 }
 
 @Composable
-fun DialogSetting(pointCurrent:Int ,onDismissRequest:() -> Unit, onClickResetAnnotator:(Int) -> Unit){
+fun SettingNewGame(onDismissRequest: () -> Unit = {}, onClickCancel:() -> Unit, onClickCreate:(Int) -> Unit){
+    SelectPoints(
+        title = string_create_game,
+        onDismissRequest = onDismissRequest,
+        pointCurrent = 0,
+    ){selectedPoint ->
+        Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),onClick = { onClickCancel() }) {
+            Text(text = string_cancel)
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Button(
+            enabled = selectedPoint != 0,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),onClick = { onClickCreate(selectedPoint) }) {
+            Text(text = string_create)
+        }
+
+    }
+
+}
+
+@Composable
+fun DialogSetting(pointCurrent:Int ,onDismissRequest:() -> Unit = {}, onClickResetAnnotator:(Int) -> Unit){
+
+    SelectPoints(
+        title = string_setting_points,
+        pointCurrent = pointCurrent,
+        onDismissRequest = onDismissRequest
+    ){selectedPoint ->
+
+        Button(
+            modifier = Modifier.padding(24.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),onClick = { onClickResetAnnotator(selectedPoint) }) {
+            Text(text = string_reset.uppercase())
+        }
+
+    }
+}
+
+@Composable
+fun SelectPoints(
+    title:String,
+    pointCurrent:Int ,
+    onDismissRequest:() -> Unit = {},
+    content: @Composable RowScope.(Int) -> Unit
+){
     val pointList = listOf(12, 15, 24, 30)
     var selectedPoint by remember { mutableIntStateOf(pointCurrent) }
 
@@ -376,7 +441,7 @@ fun DialogSetting(pointCurrent:Int ,onDismissRequest:() -> Unit, onClickResetAnn
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(text = string_setting_points, fontSize = 24.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                Text(text = title, fontSize = 24.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(24.dp))
 
                 pointList.forEach { points ->
@@ -388,14 +453,14 @@ fun DialogSetting(pointCurrent:Int ,onDismissRequest:() -> Unit, onClickResetAnn
                         Text(text = "$points", color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
-                Button(
-                    modifier = Modifier.padding(24.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                    ),onClick = { onClickResetAnnotator(selectedPoint) }) {
-                    Text(text = "RESET")
-                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = { content(selectedPoint) }
+                )
             }
         }
     }
