@@ -13,11 +13,6 @@ class GetTrucoGameUseCase @Inject constructor(
 
     private val TAG = "GetTrucoGameUseCase Intern Test"
 
-    operator fun invoke(id:Int) =  try {
-        trucoRepository.getTrucoGameFromDatabase(id).toUi()
-    } catch (e: Exception) {
-        Log.i(TAG, "Error mensaje: ${e.message}")
-        TrucoUi()
-    }
+    operator fun invoke(id:Int) = trucoRepository.getTrucoGameFromDatabase(id)?.toUi() ?: TrucoUi()
 
 }

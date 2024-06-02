@@ -15,7 +15,7 @@ interface TrucoDao {
     fun getGames(): Flow<List<TrucoEntity>>
 
     @Query("select * from truco_table where id = :id ")
-    fun getGame(id: Int): TrucoEntity
+    fun getGame(id: Int): TrucoEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addGame(game: TrucoEntity)
