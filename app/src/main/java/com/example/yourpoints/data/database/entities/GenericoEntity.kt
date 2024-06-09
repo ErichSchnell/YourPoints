@@ -23,6 +23,7 @@ data class GenericoEntity(
 
     @ColumnInfo(name = "withRounds") val withRounds:Boolean = false,
     @ColumnInfo(name = "round") val round:Int = 10,
+    @ColumnInfo(name = "roundPlayed") val roundPlayed:Int = 1,
 
     @ColumnInfo(name = "playerMax") val playerMax:Int = 30,
     @ColumnInfo(name = "player") val player:String
@@ -39,6 +40,7 @@ fun GenericoDomain.toEntity() = GenericoEntity(
     finishToWin = finishToWin,
     withRounds = withRounds,
     round = round,
+    roundPlayed = roundPlayed,
     playerMax = playerMax,
     player = Gson().toJson(player),
 )

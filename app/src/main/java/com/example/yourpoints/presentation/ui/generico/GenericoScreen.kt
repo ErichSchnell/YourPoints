@@ -540,6 +540,32 @@ fun ViewPoints(
 ){
     Column(modifier = modifier) {
 
+        if (game.withRounds){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        if(game.roundPlayed <= game.roundMax){
+                            MaterialTheme.colorScheme.surfaceVariant
+                        } else {
+                            MaterialTheme.colorScheme.error
+                        }
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Round: ${game.roundPlayed} de ${game.roundMax}",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = if(game.roundPlayed <= game.roundMax){
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    } else {
+                        MaterialTheme.colorScheme.onError
+                    }
+                )
+            }
+        }
+
         game.player.forEach {
             ItemViewPoint(
                 modifier = Modifier.fillMaxWidth(),
@@ -556,7 +582,7 @@ fun ViewPoints(
             Modifier
                 .fillMaxWidth()
                 .padding(24.dp)) {
-            if (game.finished){
+            if (game.finished || game.roundPlayed > game.roundMax){
                 FloatingActionButton(
                     onClick = { onClickResetGame() }
                 ) {

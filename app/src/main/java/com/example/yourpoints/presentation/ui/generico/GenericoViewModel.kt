@@ -127,9 +127,11 @@ class GenericoViewModel @Inject constructor(
     fun updatePoints(points: List<Int>) {
 
         var index = 0
-        _game.value = _game.value.setPlayers(
-            players = _game.value.player.map { it.setPoint(points[index++])}
-        )
+        _game.value = _game.value
+            .setPlayers(
+                players = _game.value.player.map { it.setPoint(points[index++])}
+            )
+            .incRound()
 
         _uiState.value = GenericoUiState.VIEW_POINTS
 
