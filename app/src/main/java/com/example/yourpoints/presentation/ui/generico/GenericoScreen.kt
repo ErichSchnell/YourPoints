@@ -609,7 +609,7 @@ fun ItemViewPoint(
 
         if (game.withPoints){
             LinearProgressIndicator(
-                progress = { ((player.playerPoint * 1f) / game.pointToFinish) },
+                progress = { ((player.playerPoint * 1f - game.pointToInit) / (game.pointToFinish - game.pointToInit)) },
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 24.dp, end = 12.dp),

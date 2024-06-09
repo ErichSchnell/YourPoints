@@ -76,8 +76,9 @@ class GenericoViewModel @Inject constructor(
 
         val players: MutableList<GenericoPlayerUi> = mutableListOf()
         for(i in 0 until cantPlayers){
-            players.add(GenericoPlayerUi(playerName = "Player ${i + 1}"))
+            players.add(GenericoPlayerUi(playerName = "Player ${i + 1}", playerPoint = pointInit))
         }
+
 
         _game.value = GenericoUi(
             id = getDate().hashCode(),
