@@ -7,12 +7,6 @@ import com.example.yourpoints.presentation.model.toUi
 import javax.inject.Inject
 
 
-class GetTrucoGameUseCase @Inject constructor(
-    private val trucoRepository: TrucoRepository
-) {
-
-    private val TAG = "GetTrucoGameUseCase Intern Test"
-
+class GetTrucoGameUseCase @Inject constructor(private val trucoRepository: TrucoRepository) {
     operator fun invoke(id:Int) = trucoRepository.getTrucoGameFromDatabase(id)?.toUi() ?: TrucoUi()
-
 }

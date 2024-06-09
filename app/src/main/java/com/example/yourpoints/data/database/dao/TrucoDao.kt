@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TrucoDao {
     @Query("select * from truco_table order by dataCreated desc")
-    fun getGames(): Flow<List<TrucoEntity>>
+    fun getGames(): Flow<List<TrucoEntity?>?>
 
     @Query("select * from truco_table where id = :id ")
     fun getGame(id: Int): TrucoEntity?

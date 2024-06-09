@@ -21,7 +21,7 @@ class GetAllGenericoGameUseCase  @Inject constructor(
         genericoRepository.getAllGames().map { item -> item.map { it.toUi() } }
     } catch (e: Exception) {
         Log.i(TAG, "Error mensaje: ${e.message}")
-        flow<List<GenericoUi>> { emptyList<GenericoUi>() }
+        flow { emptyList<GenericoUi>() }
     }
 
 }

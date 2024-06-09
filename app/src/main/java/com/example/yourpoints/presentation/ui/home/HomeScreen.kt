@@ -8,7 +8,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,15 +17,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -43,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -51,6 +49,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.yourpoints.presentation.model.GenericoUi
 import com.example.yourpoints.presentation.model.TrucoUi
+import com.example.yourpoints.presentation.ui.theme.string_generico
+import com.example.yourpoints.presentation.ui.theme.string_truco
 
 private const val TAG = "HomeScreen Intern Test"
 
@@ -237,8 +237,7 @@ fun Games(modifier:Modifier = Modifier, games: List<Any>, onTap: (Int) -> Unit, 
 }
 @Composable
 fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int) -> Unit){
-    val border = if(game.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceDim
-//    val text = if(game.selected) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.onPrimary
+    val borderColor = if(game.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceDim
 
     Card(
         modifier = Modifier
@@ -251,7 +250,7 @@ fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int)
             .clip(RoundedCornerShape(12.dp))
             .padding(horizontal = 16.dp)
             .padding(vertical = 8.dp)
-            .border(2.dp, border, RoundedCornerShape(12.dp))
+            .border(2.dp, borderColor, RoundedCornerShape(12.dp))
     ) {
         Box(
             modifier = Modifier
@@ -260,28 +259,33 @@ fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int)
                 .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
+            Text(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(8.dp),
+                text = string_truco,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.tertiary,
+            )
 
             Row( modifier = Modifier.fillMaxWidth()){
                 Text(
                     modifier = Modifier.weight(1f),
                     text = game.player1.playerName,
-                    fontSize = 24.sp,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
                 Text(
                     text = game.pointLimit.toString(),
-                    fontSize = 24.sp,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.tertiary,
-                    fontWeight = FontWeight.Bold
                 )
                 Text(
                     modifier = Modifier.weight(1f),
                     text = game.player2.playerName,
-                    fontSize = 24.sp,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
             }
@@ -291,9 +295,8 @@ fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int)
                     .align(Alignment.BottomCenter)
                     .padding(8.dp),
                 text = game.dataCreated,
-                fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.tertiary,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }
@@ -324,36 +327,33 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
         ) {
 
             Text(
-                modifier = Modifier.align(Alignment.TopCenter),
-                text = "Generico",
-                color = MaterialTheme.colorScheme.secondary,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(8.dp),
+                text = string_generico,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.tertiary,
             )
 
             Row( modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = game.id.toString(),
-                    fontSize = 24.sp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = "Cant Players: ",
-                    fontSize = 24.sp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = game.playerMax.toString(),
-                    fontSize = 24.sp,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    fontWeight = FontWeight.Bold
-                )
+
+                Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                    Text(
+                        text = game.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.tertiary,
+                    )
+                }
+                Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+
+                    Icon(imageVector = Icons.Default.Face, contentDescription = "")
+                    Text(
+                        text = game.playerMax.toString(),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.secondary,
+                    )
+                }
+
             }
 
             Text(
@@ -361,9 +361,8 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
                     .align(Alignment.BottomCenter)
                     .padding(8.dp),
                 text = game.dataCreated,
-                fontSize = 12.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.tertiary,
-                fontWeight = FontWeight.Bold
             )
         }
     }

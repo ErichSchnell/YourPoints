@@ -11,6 +11,8 @@ data class GenericoDomain (
     val id:Int,
     val dataCreated: String,
 
+    val name: String,
+
     val withPoints:Boolean,
     val pointToInit:Int,
     val pointToFinish:Int,
@@ -35,6 +37,7 @@ fun GenericoEntity.toDomain() :GenericoDomain{
     return GenericoDomain(
         id = id,
         dataCreated = dataCreated,
+        name = name,
         withPoints = withPoints,
         pointToInit = pointToInit,
         pointToFinish = pointToFinish,
@@ -49,6 +52,7 @@ fun GenericoEntity.toDomain() :GenericoDomain{
 fun GenericoUi.toDomain() = GenericoDomain(
     id = id,
     dataCreated = dataCreated,
+    name = name,
     withPoints = withPoints,
     pointToInit = pointToInit,
     pointToFinish = pointToFinish,

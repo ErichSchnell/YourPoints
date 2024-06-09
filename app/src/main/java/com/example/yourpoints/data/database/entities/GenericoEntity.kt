@@ -14,6 +14,8 @@ data class GenericoEntity(
     @PrimaryKey val id:Int,
     @ColumnInfo(name = "dataCreated") val dataCreated: String = "",
 
+    @ColumnInfo(name = "name") val name: String = "",
+
     @ColumnInfo(name = "withPoints") val withPoints:Boolean = false,
     @ColumnInfo(name = "pointToInit") val pointToInit:Int = 0,
     @ColumnInfo(name = "pointToFinish") val pointToFinish:Int = 100,
@@ -30,6 +32,7 @@ data class GenericoEntity(
 fun GenericoDomain.toEntity() = GenericoEntity(
     id = id,
     dataCreated = dataCreated,
+    name = name,
     withPoints = withPoints,
     pointToInit = pointToInit,
     pointToFinish = pointToFinish,

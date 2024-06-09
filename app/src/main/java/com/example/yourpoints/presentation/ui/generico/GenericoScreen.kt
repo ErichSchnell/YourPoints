@@ -1,6 +1,7 @@
 package com.example.yourpoints.presentation.ui.generico
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -56,6 +57,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -73,6 +75,7 @@ fun GenericoScreen(
     genericoViewModel: GenericoViewModel = hiltViewModel(),
     gameId:Int
 ){
+    val context = LocalContext.current
     val uiState by genericoViewModel.uiState.collectAsState()
     val game by genericoViewModel.game.collectAsState()
 
@@ -86,8 +89,11 @@ fun GenericoScreen(
 
         GenericoUiState.CREATE -> CreateGame(
             modifier = Modifier.fillMaxSize(),
-            onClickCreateGame = { cantPlayers, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds ->
-                genericoViewModel.createGame(pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds, cantPlayers)
+            onClickCreateGame = { name, cantPlayers, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds ->
+                if (name.isNotEmpty())
+                    genericoViewModel.createGame(name, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds, cantPlayers)
+                else
+                    Toast.makeText(context, "Error: Set Name",Toast.LENGTH_SHORT).show()
             }
         )
 
@@ -138,8 +144,9 @@ fun Loading(modifier: Modifier) {
 @Composable
 fun CreateGame(
     modifier: Modifier = Modifier,
-    onClickCreateGame:(Int, Boolean, Int, Int, Boolean, Boolean, Int) -> Unit
+    onClickCreateGame:(String, Int, Boolean, Int, Int, Boolean, Boolean, Int) -> Unit
 ){
+    var name by remember { mutableStateOf("") }
     var cantPlayers by remember { mutableIntStateOf(2) }
     var pointFlag by remember { mutableStateOf(false) }
     var pointInit by remember { mutableIntStateOf(0) }
@@ -153,6 +160,13 @@ fun CreateGame(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        SetName(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            name = name,
+            onValueChange = { name = it }
+        )
         CantPlayers(
             Modifier
                 .fillMaxWidth()
@@ -195,6 +209,7 @@ fun CreateGame(
                 .padding(24.dp),
             onClick = {
                 onClickCreateGame(
+                    name,
                     cantPlayers,
                     pointFlag,
                     pointInit,
@@ -211,6 +226,16 @@ fun CreateGame(
                 modifier = Modifier.size(18.dp)
             )
         }
+    }
+}
+@Composable
+fun SetName(modifier: Modifier = Modifier, name:String, onValueChange:(String) -> Unit){
+    Column(modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = "Name Game:",
+            style = MaterialTheme.typography.headlineMedium
+        )
+        TextField(value = name, onValueChange = {onValueChange(it)})
     }
 }
 @Composable
@@ -527,7 +552,10 @@ fun ViewPoints(
         Spacer(modifier = Modifier.weight(1f))
 
 
-        Row(Modifier.fillMaxWidth().padding(24.dp)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(24.dp)) {
             if (game.finished){
                 FloatingActionButton(
                     onClick = { onClickResetGame() }

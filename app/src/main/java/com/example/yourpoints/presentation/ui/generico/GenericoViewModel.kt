@@ -64,6 +64,7 @@ class GenericoViewModel @Inject constructor(
     }
 
     fun createGame(
+        name: String,
         pointFlag: Boolean,
         pointInit: Int,
         pointFinish: Int,
@@ -81,6 +82,7 @@ class GenericoViewModel @Inject constructor(
         _game.value = GenericoUi(
             id = getDate().hashCode(),
             dataCreated = getDate(),
+            name = name,
             withPoints = pointFlag,
             pointToInit = pointInit,
             pointToFinish = pointFinish,

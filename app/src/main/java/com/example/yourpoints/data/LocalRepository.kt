@@ -20,8 +20,8 @@ class TrucoRepository @Inject constructor(
     /*
     * ----------------- TRUCO DAO ---------------------------
     * */
-    fun getAllGames(): Flow<List<TrucoDomain>>{
-        return trucoDao.getGames().map{ item -> item.map{ it.toDomain() } }
+    fun getAllGames(): Flow<List<TrucoDomain?>?>{
+        return trucoDao.getGames().map{ item -> item?.map{ it?.toDomain() } }
     }
     fun getTrucoGameFromDatabase(id:Int): TrucoDomain? {
         return trucoDao.getGame(id)?.toDomain()

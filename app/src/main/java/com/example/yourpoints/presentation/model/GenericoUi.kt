@@ -9,6 +9,8 @@ data class GenericoUi(
     val dataCreated: String = "",
     val selected:Boolean = false,
 
+    val name: String = "",
+
     val withPoints:Boolean = false,
     val pointToInit:Int = 0,
     val pointToFinish:Int = 100,
@@ -56,6 +58,7 @@ data class GenericoPlayerUi(
 fun GenericoDomain.toUi() = GenericoUi(
     id = id,
     dataCreated = dataCreated,
+    name = name,
     withPoints = withPoints,
     pointToInit = pointToInit,
     pointToFinish = pointToFinish,
