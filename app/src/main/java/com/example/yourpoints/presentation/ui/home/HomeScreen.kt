@@ -16,12 +16,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,6 +33,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -341,17 +345,42 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
                     Text(
                         text = game.name,
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.tertiary,
+                        color = MaterialTheme.colorScheme.secondary,
                     )
                 }
                 Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
 
-                    Icon(imageVector = Icons.Default.Face, contentDescription = "")
-                    Text(
-                        text = game.playerMax.toString(),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.secondary,
-                    )
+                    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(imageVector = Icons.Default.Face, contentDescription = "")
+                        Text(
+                            text = game.playerMax.toString(),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSecondary,
+                        )
+                    }
+                    VerticalDivider(Modifier.height(24.dp).padding(horizontal = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(imageVector = Icons.Default.List, contentDescription = "")
+                        Text(
+                            text = if(game.withPoints) "${game.pointToInit}-${game.pointToFinish}" else "-",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSecondary,
+                        )
+                    }
+                    VerticalDivider(Modifier.height(24.dp).padding(horizontal = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(imageVector = Icons.Default.Refresh, contentDescription = "")
+                        Text(
+                            text = if(game.withRounds) "${game.roundPlayed}/${game.roundMax}" else "-",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSecondary,
+                        )
+                    }
+
+
+
                 }
 
             }
