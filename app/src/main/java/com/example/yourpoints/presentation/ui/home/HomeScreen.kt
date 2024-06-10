@@ -272,26 +272,46 @@ fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int)
                 color = MaterialTheme.colorScheme.tertiary,
             )
 
-            Row( modifier = Modifier.fillMaxWidth()){
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = game.player1.playerName,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.secondary,
-                    textAlign = TextAlign.Center
-                )
+            Row( modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+
+                Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = game.player1.playerName,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.secondary,
+                        )
+                        Text(
+                            text = game.player1.playerPoint.toString(),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                }
+
                 Text(
                     text = game.pointLimit.toString(),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.tertiary,
                 )
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = game.player2.playerName,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.secondary,
-                    textAlign = TextAlign.Center
-                )
+
+                Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = game.player2.playerName,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.secondary,
+                        )
+                        Text(
+                            text = game.player2.playerPoint.toString(),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                }
+
+
+
             }
 
             Text(
@@ -354,8 +374,8 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
                         Icon(imageVector = Icons.Default.Face, contentDescription = "")
                         Text(
                             text = game.playerMax.toString(),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSecondary,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                     VerticalDivider(Modifier.height(24.dp).padding(horizontal = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -364,8 +384,8 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
                         Icon(imageVector = Icons.Default.List, contentDescription = "")
                         Text(
                             text = if(game.withPoints) "${game.pointToInit}-${game.pointToFinish}" else "-",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSecondary,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                     VerticalDivider(Modifier.height(24.dp).padding(horizontal = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -374,8 +394,8 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
                         Icon(imageVector = Icons.Default.Refresh, contentDescription = "")
                         Text(
                             text = if(game.withRounds) "${game.roundPlayed}/${game.roundMax}" else "-",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSecondary,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
 
