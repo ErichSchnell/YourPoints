@@ -1,6 +1,9 @@
 package com.example.yourpoints.presentation.ui.home
 
+import android.os.Build
+import android.provider.ContactsContract.Data
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yourpoints.domain.annotatorGenerico.DeleteGenericoGameUseCase
@@ -16,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 private const val TAG = "HomeViewModel Intern Test"
@@ -58,12 +62,11 @@ class HomeViewModel @Inject constructor(
 
                         _gamesTruco.value = it
 
-//                        actualizarGames()
-                        _games.value = _gamesTruco.value + _gamesGenerico.value
+                        actualizarGames()
 
                         _gameSelected.value = verifyGameSelected()
 
-                        if (it.isNotEmpty()){
+                        if (_games.value.isNotEmpty()){
                             _uiState.value = HomeViewState.SUCCESS
                         } else {
                             _uiState.value = HomeViewState.ERROR
@@ -87,11 +90,11 @@ class HomeViewModel @Inject constructor(
 
                         _gamesGenerico.value = it
 
-                        _games.value = _gamesTruco.value + _gamesGenerico.value
+                        actualizarGames()
 
                         _gameSelected.value = verifyGameSelected()
 
-                        if (it.isNotEmpty()){
+                        if (_games.value.isNotEmpty()){
                             _uiState.value = HomeViewState.SUCCESS
                         } else {
                             _uiState.value = HomeViewState.ERROR
@@ -105,17 +108,34 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+    private fun actualizarGames(){
+        val gameAux = (_gamesTruco.value + _gamesGenerico.value).toMutableList()
+        _games.value = ordenarGamesPorFecha(gameAux)
+    }
+    private fun ordenarGamesPorFecha(ListGameAux: MutableList<Any>): List<Any>  {//
+        var dateIAux: Int
+        var dateJAux: Int
+        var gameAux: Any
+        for( i in ListGameAux.indices){
+            dateIAux = if(ListGameAux[i] is TrucoUi) (ListGameAux[i] as TrucoUi).id else (ListGameAux[i] as GenericoUi).id
 
-//    private fun actualizarGames(){
-//        val gameAux = _gamesTruco.value + _gamesGenerico.value
-//        _games.value = ordenarGamesPorFecha(gameAux)
-//    }
-//    private fun ordenarGamesPorFecha(gameAux: List<Any>): List<Any> {
-//        gameAux.
-//
-//
-//        return
-//    }
+            for(j in ListGameAux.indices){
+                dateJAux = if(ListGameAux[j] is TrucoUi) (ListGameAux[j] as TrucoUi).id else (ListGameAux[j] as GenericoUi).id
+
+                if (dateIAux > dateJAux){
+
+                    gameAux = ListGameAux[i]
+                    ListGameAux[i] = ListGameAux[j]
+                    ListGameAux[j] = gameAux
+
+                    dateIAux = if(ListGameAux[i] is TrucoUi) (ListGameAux[i] as TrucoUi).id else (ListGameAux[i] as GenericoUi).id
+                }
+
+            }
+            Log.i(TAG, "ordenarGamesPorFecha ListGameAux: $ListGameAux")
+        }
+        return ListGameAux
+    }
 
     fun deleteGames(){
         val gamesToDelete: MutableList<Any> = mutableListOf()

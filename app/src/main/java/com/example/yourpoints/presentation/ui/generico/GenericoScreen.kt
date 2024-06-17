@@ -687,7 +687,7 @@ fun ScoreCircleBox(
 }
 
 @Composable
-fun BadgedBoxScore(victories: Int, finishToWin: Boolean) {
+fun BadgedBoxScore(victories: Int, finishToWin: Boolean) { //Badge (probar)
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = "$victories", fontSize = 16.sp)
         Image(
