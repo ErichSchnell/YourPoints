@@ -6,6 +6,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -57,6 +59,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -99,7 +102,7 @@ fun GenericoScreen(
 
         GenericoUiState.SELECT_NAME -> SelectName(
             modifier = Modifier.fillMaxSize(),
-            cantPlayers = game.playerMax,
+            cantPlayers = game.player.size,
             onValueChange = {
                             genericoViewModel.updateNames(it)
             },
@@ -110,6 +113,9 @@ fun GenericoScreen(
             game = game,
             onValueChange = {
                 genericoViewModel.updatePoints(it)
+            },
+            onAddPlayer = {
+                genericoViewModel.addPLayer()
             }
         )
 
@@ -121,6 +127,12 @@ fun GenericoScreen(
             },
             onClickResetGame = {
                 genericoViewModel.resetGame()
+            },
+            onAddPlayer = {
+                genericoViewModel.addPLayer()
+            },
+            onDeletePlayer = { player ->
+                genericoViewModel.deletePLayer(player)
             }
         )
     }
@@ -446,7 +458,8 @@ fun PrototypePlayer(
 fun SetPoints(
     modifier: Modifier = Modifier,
     game: GenericoUi,
-    onValueChange: (List<Int>) -> Unit
+    onValueChange: (List<Int>) -> Unit,
+    onAddPlayer:() -> Unit
 ){
 
     val newPoints by remember { mutableStateOf( mutableListOf<Int>() ) }
@@ -454,6 +467,7 @@ fun SetPoints(
     game.player.forEach {
         newPoints.add(it.playerPoint)
     }
+
 
     Column(modifier = modifier) {
 
@@ -468,6 +482,7 @@ fun SetPoints(
             )
             HorizontalDivider()
         }
+        AddPlayer(onAddPlayer)
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -537,6 +552,8 @@ fun ViewPoints(
     game: GenericoUi,
     onClickViewChange:() -> Unit,
     onClickResetGame:() -> Unit,
+    onAddPlayer:() -> Unit,
+    onDeletePlayer:(GenericoPlayerUi) -> Unit,
 ){
     Column(modifier = modifier) {
 
@@ -545,7 +562,7 @@ fun ViewPoints(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        if(game.roundPlayed <= game.roundMax){
+                        if (game.roundPlayed <= game.roundMax) {
                             MaterialTheme.colorScheme.surfaceVariant
                         } else {
                             MaterialTheme.colorScheme.error
@@ -570,10 +587,12 @@ fun ViewPoints(
             ItemViewPoint(
                 modifier = Modifier.fillMaxWidth(),
                 game = game,
+                onLongPress = onDeletePlayer,
                 player = it
             )
             HorizontalDivider()
         }
+        AddPlayer(onAddPlayer)
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -608,12 +627,31 @@ fun ViewPoints(
     }
 }
 @Composable
+fun AddPlayer(onAddPlayer:() -> Unit){
+    Row (
+        modifier = Modifier.fillMaxWidth().height(100.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            modifier = Modifier.clickable { onAddPlayer() },
+            text = "Add New Player..."
+        )
+    }
+}
+@Composable
 fun ItemViewPoint(
     modifier:Modifier = Modifier,
     game: GenericoUi,
-    player:GenericoPlayerUi
+    player:GenericoPlayerUi,
+    onLongPress:(GenericoPlayerUi) -> Unit,
 ){
-    Row(modifier = modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier.padding(8.dp).pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = { onLongPress(player) },
+                )
+        },
+        verticalAlignment = Alignment.CenterVertically) {
 
         ScoreCircleBox(
             modifier = Modifier.size(50.dp),

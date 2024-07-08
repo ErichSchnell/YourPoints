@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.yourpoints.data.database.DatabaseService
+import com.example.yourpoints.data.database.MIGRATION_1_2
 import com.example.yourpoints.data.database.dao.TrucoDao
 import dagger.Module
 import dagger.Provides
@@ -22,7 +23,7 @@ object RoomModule {
     @Singleton
     @Provides
     fun provideRoom(@ApplicationContext context: Context): DatabaseService{
-        return Room.databaseBuilder(context, DatabaseService::class.java, ANNOTATOR_DATABASE_NAME).build()
+        return Room.databaseBuilder(context, DatabaseService::class.java, ANNOTATOR_DATABASE_NAME).addMigrations(MIGRATION_1_2).build()
     }
 
     @Singleton

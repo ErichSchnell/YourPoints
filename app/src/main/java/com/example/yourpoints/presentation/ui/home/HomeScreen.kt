@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.yourpoints.R
 import com.example.yourpoints.presentation.model.GenericoUi
 import com.example.yourpoints.presentation.model.TrucoUi
 import com.example.yourpoints.presentation.ui.theme.string_generico
@@ -213,7 +215,7 @@ fun OptionBar(
 fun Games(modifier:Modifier = Modifier, games: List<Any>, onTap: (Int) -> Unit, onLongPress:(Int) -> Unit) {
     Column(modifier.background(MaterialTheme.colorScheme.background), horizontalAlignment = Alignment.CenterHorizontally) {
         if (games.isNotEmpty()) {
-            LazyColumn(){
+            LazyColumn{
                 Log.i(TAG, "Game.size: ${games.size}")
                 items(games.size) {index ->
                     Log.i(TAG, "Game[$index]: ${games[index]}")
@@ -373,22 +375,28 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
                     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(imageVector = Icons.Default.Face, contentDescription = "")
                         Text(
-                            text = game.playerMax.toString(),
+                            text = game.player.size.toString(),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )
                     }
-                    VerticalDivider(Modifier.height(24.dp).padding(horizontal = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    VerticalDivider(
+                        Modifier
+                            .height(24.dp)
+                            .padding(horizontal = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
 
                     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(imageVector = Icons.Default.List, contentDescription = "")
+                        Icon(painter = painterResource(id = R.drawable.ic_scoreboard), contentDescription = "")
                         Text(
                             text = if(game.withPoints) "${game.pointToInit}-${game.pointToFinish}" else "-",
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )
                     }
-                    VerticalDivider(Modifier.height(24.dp).padding(horizontal = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    VerticalDivider(
+                        Modifier
+                            .height(24.dp)
+                            .padding(horizontal = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
 
                     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(imageVector = Icons.Default.Refresh, contentDescription = "")

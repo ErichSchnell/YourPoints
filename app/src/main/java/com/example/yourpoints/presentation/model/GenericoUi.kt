@@ -21,7 +21,6 @@ data class GenericoUi(
     val roundMax:Int = 10,
     val roundPlayed:Int = 1,
 
-    val playerMax:Int = 30,
     val player:MutableList<GenericoPlayerUi> = mutableListOf()
 ) {
     fun changeSelect() = this.copy(
@@ -70,7 +69,6 @@ fun GenericoDomain.toUi() = GenericoUi(
     finishToWin = finishToWin,
     withRounds = withRounds,
     roundMax = round,
-    playerMax = playerMax,
     roundPlayed = roundPlayed,
     player = player.map { it.toUi() }.toMutableList(),
 )

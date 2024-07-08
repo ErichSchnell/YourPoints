@@ -90,7 +90,6 @@ class GenericoViewModel @Inject constructor(
             finishToWin = finishToWin,
             withRounds = roundFlag,
             roundMax = rounds,
-            playerMax = cantPlayers,
             player = players
         )
 
@@ -161,7 +160,8 @@ class GenericoViewModel @Inject constructor(
     }
     private fun updateRoomGame(){
         Log.i(TAG, "updateGenericoGame: listorti")
-
+        val valueAux = _uiState.value
+        _uiState.value = GenericoUiState.LOADING
         viewModelScope.launch {
             withContext(Dispatchers.IO){
                 try {
@@ -170,6 +170,7 @@ class GenericoViewModel @Inject constructor(
                     Log.i(TAG, "updateGenericoGame room: No se actualizo game")
                     Log.i(TAG, "updateGenericoGame error: ${e.message}")
                 }
+                _uiState.value = valueAux
             }
         }
     }
@@ -182,6 +183,31 @@ class GenericoViewModel @Inject constructor(
     fun resetGame() {
         _game.value = _game.value.resetGame()
         updateRoomGame()
+    }
+
+    fun addPLayer() {
+        val players = _game.value.player
+
+        players.add(
+            GenericoPlayerUi(
+                playerName = "Player ${players.size + 1}", playerPoint = 0
+            )
+        )
+
+        _game.value = _game.value.setPlayers(players.toList())
+        updateRoomGame()
+    }
+
+    fun deletePLayer(player: GenericoPlayerUi) {
+        val players = _game.value.player
+
+        if (players.remove(player)){
+            _game.value = _game.value.setPlayers(players.toList())
+            updateRoomGame()
+        } else {
+            Log.i(TAG, "deletePLayer: error")
+        }
+
     }
 }
 
