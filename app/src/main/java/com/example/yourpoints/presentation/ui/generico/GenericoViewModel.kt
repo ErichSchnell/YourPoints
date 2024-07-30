@@ -72,12 +72,12 @@ class GenericoViewModel @Inject constructor(
 
     fun createGame(
         name: String,
-        pointFlag: Boolean,
+//        pointFlag: Boolean,
         pointInit: Int,
-        pointFinish: Int,
-        finishToWin: Boolean,
-        roundFlag: Boolean,
-        rounds: Int,
+        pointFinish: Int?,
+        finishToWin: Boolean?,
+//        roundFlag: Boolean,
+        rounds: Int?,
         cantPlayers: Int,
     ) {
 
@@ -91,11 +91,9 @@ class GenericoViewModel @Inject constructor(
             id = getDate().hashCode(),
             dataCreated = getDate(),
             name = name,
-            withPoints = pointFlag,
             pointToInit = pointInit,
             pointToFinish = pointFinish,
             finishToWin = finishToWin,
-            withRounds = roundFlag,
             roundMax = rounds,
             player = players
         )
@@ -153,14 +151,14 @@ class GenericoViewModel @Inject constructor(
     }
     private fun verifyPlayerReachedGoal(){
         var gameFinished:Boolean = _game.value.finished
-        if (_game.value.withPoints){
+        if (_game.value.pointToFinish != null){
             _game.value = _game.value.setPlayers(
                 players = _game.value.player.map {
-                    if(it.playerPoint >= _game.value.pointToFinish && it.addVictoryFlag){
+                    if(it.playerPoint >= _game.value.pointToFinish!! && it.addVictoryFlag){
                         gameFinished = true
                         it.addVictories().setAddVictoryFlag(false)
                     } else {
-                        if (it.playerPoint < _game.value.pointToFinish && !it.addVictoryFlag){
+                        if (it.playerPoint < _game.value.pointToFinish!! && !it.addVictoryFlag){
                             it.lessVictories().setAddVictoryFlag(true)
                         } else {
                             it
@@ -198,7 +196,7 @@ class GenericoViewModel @Inject constructor(
     }
 
     fun addPLayer() {
-        val players = _game.value.player
+        val players = _game.value.player.toMutableList()
 
         players.add(
             GenericoPlayerUi(
@@ -213,7 +211,7 @@ class GenericoViewModel @Inject constructor(
     fun deletePLayer() {
         if(_playerSelected.value == null) return
 
-        val players = _game.value.player
+        val players = _game.value.player.toMutableList()
 
         if (players.remove(_playerSelected.value)){
             _game.value = _game.value.setPlayers(players.toList())

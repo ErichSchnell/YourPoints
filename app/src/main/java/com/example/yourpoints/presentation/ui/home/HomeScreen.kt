@@ -388,7 +388,7 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
                     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(painter = painterResource(id = R.drawable.ic_scoreboard), contentDescription = "")
                         Text(
-                            text = if(game.withPoints) "${game.pointToInit}-${game.pointToFinish}" else "-",
+                            text = if(game.pointToFinish != null) "${game.pointToInit}-${game.pointToFinish}" else "-",
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )
@@ -402,7 +402,7 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
 //                        Icon(imageVector = Icons.Default.Refresh, contentDescription = "")
                         Icon(painter = painterResource(id = R.drawable.ic_rounds), contentDescription = "")
                         Text(
-                            text = if (game.withRounds) "${game.roundPlayed}/${game.roundMax}" else "-",
+                            text = if (game.roundMax != null) "${game.roundPlayed}/${game.roundMax}" else "-",
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )

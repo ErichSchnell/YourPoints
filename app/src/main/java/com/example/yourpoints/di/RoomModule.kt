@@ -2,11 +2,8 @@ package com.example.yourpoints.di
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.yourpoints.data.database.DatabaseService
-import com.example.yourpoints.data.database.MIGRATION_1_2
-import com.example.yourpoints.data.database.dao.TrucoDao
+import com.example.yourpoints.data.database.MIGRATION_2_3
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +20,11 @@ object RoomModule {
     @Singleton
     @Provides
     fun provideRoom(@ApplicationContext context: Context): DatabaseService{
-        return Room.databaseBuilder(context, DatabaseService::class.java, ANNOTATOR_DATABASE_NAME).addMigrations(MIGRATION_1_2).build()
+        return Room
+            .databaseBuilder(context, DatabaseService::class.java, ANNOTATOR_DATABASE_NAME)
+            .addMigrations(MIGRATION_2_3)
+            .fallbackToDestructiveMigration()
+            .build() //
     }
 
     @Singleton

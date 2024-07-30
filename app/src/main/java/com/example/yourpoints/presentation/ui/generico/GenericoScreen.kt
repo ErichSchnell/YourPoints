@@ -77,32 +77,39 @@ private const val TAG = "GenericoScreen Intern Test"
 @Composable
 fun GenericoScreen(
     genericoViewModel: GenericoViewModel = hiltViewModel(),
-    gameId:Int
-){
+    gameId: Int
+) {
     val context = LocalContext.current
     val uiState by genericoViewModel.uiState.collectAsState()
     val game by genericoViewModel.game.collectAsState()
     val loading by genericoViewModel.loading.collectAsState()
 
-    var showDialogChangeName by remember { mutableStateOf( false) }
+    var showDialogChangeName by remember { mutableStateOf(false) }
 
     val playerSelected by genericoViewModel.playerSelected.collectAsState()
 
 
-    LaunchedEffect(true){
+    LaunchedEffect(true) {
         genericoViewModel.initGenerico(gameId)
     }
 
-    when(uiState){
+    when (uiState) {
         GenericoUiState.LOADING -> Loading(Modifier.fillMaxSize())
 
         GenericoUiState.CREATE -> CreateGame(
             modifier = Modifier.fillMaxSize(),
-            onClickCreateGame = { name, cantPlayers, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds ->
+            onClickCreateGame = { name, pointInit, pointFinish, finishToWin, rounds, cantPlayers ->
                 if (name.isNotEmpty())
-                    genericoViewModel.createGame(name, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds, cantPlayers)
+                    genericoViewModel.createGame(
+                        name,
+                        pointInit,
+                        pointFinish,
+                        finishToWin,
+                        rounds,
+                        cantPlayers
+                    )
                 else
-                    Toast.makeText(context, "Error: Set Name",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Error: Set Name", Toast.LENGTH_SHORT).show()
             }
         )
 
@@ -110,7 +117,7 @@ fun GenericoScreen(
             modifier = Modifier.fillMaxSize(),
             cantPlayers = game.player.size,
             onValueChange = {
-                            genericoViewModel.updateNames(it)
+                genericoViewModel.updateNames(it)
             },
         )
 
@@ -144,10 +151,10 @@ fun GenericoScreen(
             }
         )
     }
-    if (loading){
+    if (loading) {
         Loading(Modifier.fillMaxSize())
     }
-    if(playerSelected != null){
+    if (playerSelected != null) {
         Log.i(TAG, "playerSelected: $playerSelected")
         Dialog(onDismissRequest = { genericoViewModel.setPlayerSelected(null) }) {
             Column {
@@ -164,8 +171,8 @@ fun GenericoScreen(
             }
         }
     }
-    if (showDialogChangeName){
-        DialogChangeName(onDismissRequest = { showDialogChangeName = false }){
+    if (showDialogChangeName) {
+        DialogChangeName(onDismissRequest = { showDialogChangeName = false }) {
             genericoViewModel.changeName(it)
         }
     }
@@ -189,16 +196,16 @@ fun Loading(modifier: Modifier) {
 @Composable
 fun CreateGame(
     modifier: Modifier = Modifier,
-    onClickCreateGame:(String, Int, Boolean, Int, Int, Boolean, Boolean, Int) -> Unit
-){
+    onClickCreateGame: (String, Int, Int?, Boolean?, Int?, Int) -> Unit
+) {
     var name by remember { mutableStateOf("") }
     var cantPlayers by remember { mutableIntStateOf(2) }
     var pointFlag by remember { mutableStateOf(false) }
     var pointInit by remember { mutableIntStateOf(0) }
-    var pointFinish by remember { mutableIntStateOf(100) }
-    var finishToWin by remember { mutableStateOf(true) }
+    var pointFinish:Int? by remember { mutableStateOf(null) }
+    var finishToWin:Boolean? by remember { mutableStateOf(null) }
     var roundFlag by remember { mutableStateOf(false) }
-    var rounds by remember { mutableIntStateOf(10) }
+    var rounds:Int? by remember { mutableStateOf(null) }
 
     Column(
         modifier = modifier,
@@ -244,7 +251,7 @@ fun CreateGame(
                 .padding(16.dp),
             roundFlag = roundFlag,
             onClickRoundFlag = { roundFlag = it },
-            rounds = rounds,
+            rounds = rounds ?: 10,
             onClickRounds = { rounds = it },
         )
 
@@ -255,13 +262,11 @@ fun CreateGame(
             onClick = {
                 onClickCreateGame(
                     name,
-                    cantPlayers,
-                    pointFlag,
                     pointInit,
                     pointFinish,
                     finishToWin,
-                    roundFlag,
                     rounds,
+                    cantPlayers,
                 )
             }
         ) {
@@ -273,18 +278,24 @@ fun CreateGame(
         }
     }
 }
+
 @Composable
-fun SetName(modifier: Modifier = Modifier, name:String, onValueChange:(String) -> Unit){
-    Column(modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+fun SetName(modifier: Modifier = Modifier, name: String, onValueChange: (String) -> Unit) {
+    Column(
+        modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             text = "Name Game:",
             style = MaterialTheme.typography.headlineMedium
         )
-        TextField(value = name, onValueChange = {onValueChange(it)})
+        TextField(value = name, onValueChange = { onValueChange(it) })
     }
 }
+
 @Composable
-fun CantPlayers(modifier: Modifier = Modifier, cantPlayers:Int, onValueChange:(Int) -> Unit){
+fun CantPlayers(modifier: Modifier = Modifier, cantPlayers: Int, onValueChange: (Int) -> Unit) {
     ChangeNumber(
         modifier,
         title = "Players Cant",
@@ -296,30 +307,33 @@ fun CantPlayers(modifier: Modifier = Modifier, cantPlayers:Int, onValueChange:(I
 @Composable
 fun Points(
     modifier: Modifier = Modifier,
-    pointFlag:Boolean,
-    onClickPointFlag:(Boolean) -> Unit,
-    pointInit:Int,
-    onClickPointInit:(Int) -> Unit,
-    finishToWin:Boolean,
-    onClickFinishToWin:(Boolean) -> Unit,
-    pointFinish:Int,
-    onClickPointFinish:(Int) -> Unit,
-){
+    pointFlag: Boolean,
+    onClickPointFlag: (Boolean) -> Unit,
+    pointInit: Int,
+    onClickPointInit: (Int) -> Unit,
+    finishToWin: Boolean?,
+    onClickFinishToWin: (Boolean) -> Unit,
+    pointFinish: Int?,
+    onClickPointFinish: (Int) -> Unit,
+) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation( defaultElevation = 12.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
     ) {
         Column {
 
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(text = "Puntajes")
                 Spacer(modifier = Modifier.weight(1f))
                 Checkbox(checked = pointFlag, onCheckedChange = { onClickPointFlag(it) })
             }
 
             AnimatedVisibility(visible = pointFlag) {
-                Column{
+                Column {
                     ChangeNumber(
                         modifier = Modifier.fillMaxWidth(),
                         title = "Point Init",
@@ -329,12 +343,12 @@ fun Points(
                     ChangeNumber(
                         modifier = Modifier.fillMaxWidth(),
                         title = "Point Finish",
-                        value = pointFinish,
+                        value = pointFinish ?: 100,
                         onValueChange = onClickPointFinish
                     )
                     FinishToWin(
                         modifier = Modifier.fillMaxWidth(),
-                        finishToWin = finishToWin,
+                        finishToWin = finishToWin ?: true,
                         onClickFinishToWin = onClickFinishToWin,
                     )
                 }
@@ -345,14 +359,14 @@ fun Points(
 }
 
 @Composable
-fun FinishToWin(modifier: Modifier, finishToWin: Boolean, onClickFinishToWin: (Boolean) -> Unit) {
+fun FinishToWin(modifier: Modifier, finishToWin: Boolean = true, onClickFinishToWin: (Boolean) -> Unit) {
     Column(modifier = modifier, verticalArrangement = Arrangement.Center) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            RadioButton(selected = finishToWin, onClick = { onClickFinishToWin(true)})
+            RadioButton(selected = finishToWin, onClick = { onClickFinishToWin(true) })
             Text(text = "Quien alcanza el puntaje, GANA")
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            RadioButton(selected = !finishToWin, onClick = { onClickFinishToWin(false)})
+            RadioButton(selected = !finishToWin, onClick = { onClickFinishToWin(false) })
             Text(text = "Quien alcanza el puntaje, PIERDE")
         }
 
@@ -362,19 +376,22 @@ fun FinishToWin(modifier: Modifier, finishToWin: Boolean, onClickFinishToWin: (B
 @Composable
 fun Rounds(
     modifier: Modifier = Modifier,
-    roundFlag:Boolean = false,
-    onClickRoundFlag:(Boolean) -> Unit,
-    rounds:Int = 0,
-    onClickRounds:(Int) -> Unit,
-){
+    roundFlag: Boolean = false,
+    onClickRoundFlag: (Boolean) -> Unit,
+    rounds: Int = 0,
+    onClickRounds: (Int) -> Unit,
+) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation( defaultElevation = 12.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
     ) {
         Column {
 
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(text = "Rounds")
                 Spacer(modifier = Modifier.weight(1f))
                 Checkbox(checked = roundFlag, onCheckedChange = { onClickRoundFlag(it) })
@@ -392,8 +409,6 @@ fun Rounds(
 }
 
 
-
-
 @Composable
 fun SelectName(
     modifier: Modifier = Modifier,
@@ -402,16 +417,16 @@ fun SelectName(
 ) {
     val playerNames by remember { mutableStateOf(mutableListOf<String>()) }
 
-    for (i in 0 until cantPlayers){
-        playerNames.add("Player ${i+1}")
+    for (i in 0 until cantPlayers) {
+        playerNames.add("Player ${i + 1}")
     }
 
     Column(modifier = modifier) {
-        for (i in 0 until cantPlayers){
+        for (i in 0 until cantPlayers) {
             PrototypePlayer(
                 modifier = Modifier.fillMaxWidth(),
                 playerName = playerNames[i],
-                onValueChange = { 
+                onValueChange = {
                     playerNames[i] = it
                 }
 
@@ -432,10 +447,10 @@ fun SelectName(
 
 @Composable
 fun PrototypePlayer(
-    modifier:Modifier = Modifier,
-    playerName:String = "",
-    onValueChange:(String) -> Unit,
-){
+    modifier: Modifier = Modifier,
+    playerName: String = "",
+    onValueChange: (String) -> Unit,
+) {
     var name by remember { mutableStateOf("") }
 
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
@@ -462,7 +477,7 @@ fun PrototypePlayer(
             modifier = Modifier.fillMaxWidth(),
             value = name,
             onValueChange = {
-                if (it.length <= 24){
+                if (it.length <= 24) {
                     name = it
                     onValueChange(name)
                 }
@@ -492,10 +507,10 @@ fun SetPoints(
     modifier: Modifier = Modifier,
     game: GenericoUi,
     onValueChange: (List<Int>) -> Unit,
-    onAddPlayer:() -> Unit
-){
+    onAddPlayer: () -> Unit
+) {
 
-    val newPoints by remember { mutableStateOf( mutableListOf<Int>() ) }
+    val newPoints by remember { mutableStateOf(mutableListOf<Int>()) }
 
     game.player.forEach {
         newPoints.add(it.playerPoint)
@@ -503,7 +518,7 @@ fun SetPoints(
 
     Column(modifier = modifier) {
 
-        game.player.forEach{ player ->
+        game.player.forEach { player ->
             ItemSetPoint(
                 modifier = Modifier.fillMaxWidth(),
                 game = game,
@@ -521,9 +536,9 @@ fun SetPoints(
         FloatingActionButton(modifier = Modifier
             .padding(24.dp)
             .align(Alignment.End), onClick = {
-                onValueChange(newPoints)
-                newPoints.clear()
-            }) {
+            onValueChange(newPoints)
+            newPoints.clear()
+        }) {
             Icon(
                 imageVector = Icons.Default.PlayArrow,
                 contentDescription = null,
@@ -532,13 +547,14 @@ fun SetPoints(
         }
     }
 }
+
 @Composable
 fun ItemSetPoint(
-    modifier:Modifier = Modifier,
-    game:GenericoUi,
-    player:GenericoPlayerUi,
-    onPointChahnge:(Int) -> Unit
-){
+    modifier: Modifier = Modifier,
+    game: GenericoUi,
+    player: GenericoPlayerUi,
+    onPointChahnge: (Int) -> Unit
+) {
     var point by remember { mutableIntStateOf(0) }
 
     Row(modifier = modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -546,8 +562,8 @@ fun ItemSetPoint(
         ScoreCircleBox(
             modifier = Modifier.size(50.dp),
             victories = player.victories,
-            score =  player.playerPoint + point,
-            victoriesVisibility = game.withPoints,
+            score = player.playerPoint + point,
+            victoriesVisibility = game.pointToFinish != null,
             finishToWin = game.finishToWin,
         )
 
@@ -582,51 +598,24 @@ fun ItemSetPoint(
 fun ViewPoints(
     modifier: Modifier = Modifier,
     game: GenericoUi,
-    onClickViewChange:() -> Unit,
-    onClickResetGame:() -> Unit,
-    onAddPlayer:() -> Unit,
-    onLongPress:(GenericoPlayerUi) -> Unit,
-){
+    onClickViewChange: () -> Unit,
+    onClickResetGame: () -> Unit,
+    onAddPlayer: () -> Unit,
+    onLongPress: (GenericoPlayerUi) -> Unit,
+) {
     Column(modifier = modifier) {
 
-        if (game.withRounds){
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        if (game.roundPlayed <= game.roundMax) {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        } else {
-                            MaterialTheme.colorScheme.error
-                        }
-                    ),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Round: ${game.roundPlayed} de ${game.roundMax}",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = if(game.roundPlayed <= game.roundMax){
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    } else {
-                        MaterialTheme.colorScheme.onError
-                    }
-                )
-            }
-        }
+        BarRounds(game.roundMax, game.roundPlayed)
 
-        game.player.forEach { player ->
-            ItemViewPoint(
-                modifier = Modifier.fillMaxWidth(),
-                game = game,
-                onLongPress = {
-                    Log.i(TAG, "player name: ${player.playerName}")
-                    onLongPress(player)
-              },
-                player = player
-            )
-            HorizontalDivider()
-        }
+        CardPlayers(
+            players = game.player.toList(),
+            finishToWin = game.finishToWin,
+            pointToInit = game.pointToInit,
+            pointToFinish = game.pointToFinish,
+            onLongPress = onLongPress
+        )
+
+
         AddPlayer(onAddPlayer)
 
         Spacer(modifier = Modifier.weight(1f))
@@ -634,8 +623,9 @@ fun ViewPoints(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(24.dp)) {
-            if (game.finished || game.roundPlayed > game.roundMax){
+                .padding(24.dp)
+        ) {
+            if (game.finished || game.roundPlayed > (game.roundMax ?: 1000)) {
                 FloatingActionButton(
                     onClick = { onClickResetGame() }
                 ) {
@@ -660,27 +650,100 @@ fun ViewPoints(
         }
     }
 }
+
 @Composable
-fun AddPlayer(onAddPlayer:() -> Unit){
-    Row (
+fun BarRounds(
+    rounds: Int?,
+    roundsPlayed: Int,
+) {
+    if (rounds == null) return
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                if (roundsPlayed <= rounds) {
+                    MaterialTheme.colorScheme.surfaceVariant
+                } else {
+                    MaterialTheme.colorScheme.error
+                }
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Round: $roundsPlayed de $rounds",
+            style = MaterialTheme.typography.titleLarge,
+            color = if (roundsPlayed <= rounds) {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            } else {
+                MaterialTheme.colorScheme.onError
+            }
+        )
+    }
+}
+
+@Composable
+fun CardPlayers(
+    players: List<GenericoPlayerUi>,
+    finishToWin: Boolean?,
+    pointToInit: Int,
+    pointToFinish: Int?,
+    onLongPress: (GenericoPlayerUi) -> Unit
+) {
+    players.forEach { player ->
+
+
+        ItemViewPoint(
+            modifier = Modifier.fillMaxWidth(),
+            player = player,
+
+            finishToWin = finishToWin,
+            pointToInit = pointToInit,
+            pointToFinish = pointToFinish,
+
+            onLongPress = onLongPress
+        )
+
+
+
+        HorizontalDivider()
+
+
+    }
+
+
+}
+
+@Composable
+fun AddPlayer(onAddPlayer: () -> Unit) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp),
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically) {
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
             modifier = Modifier.clickable { onAddPlayer() },
             text = "Add New Player..."
         )
     }
 }
+
 @Composable
 fun ItemViewPoint(
-    modifier:Modifier = Modifier,
-    game: GenericoUi,
-    player:GenericoPlayerUi,
-    onLongPress:() -> Unit,
-){
+    modifier: Modifier = Modifier,
+    player: GenericoPlayerUi,
+
+    finishToWin: Boolean?,
+    pointToInit: Int,
+    pointToFinish: Int?,
+
+    onLongPress: (GenericoPlayerUi) -> Unit,
+
+
+    ) {
     Log.i(TAG, "player name into: ${player.playerName}")
     Row(
         modifier = modifier
@@ -688,7 +751,8 @@ fun ItemViewPoint(
             .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = {
-                        onLongPress()
+                        Log.i(TAG, "player name: ${player.playerName}")
+                        onLongPress(player)
                     },
                 )
             },
@@ -697,10 +761,10 @@ fun ItemViewPoint(
 
         ScoreCircleBox(
             modifier = Modifier.size(50.dp),
-            finishToWin = game.finishToWin,
-            victoriesVisibility = game.withPoints,
+            finishToWin = finishToWin,
+            victoriesVisibility = pointToFinish != null,
             victories = player.victories,
-            score =  player.playerPoint
+            score = player.playerPoint
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -713,9 +777,9 @@ fun ItemViewPoint(
             textAlign = TextAlign.Center
         )
 
-        if (game.withPoints){
+        if (pointToFinish != null) {
             LinearProgressIndicator(
-                progress = { ((player.playerPoint * 1f - game.pointToInit) / (game.pointToFinish - game.pointToInit)) },
+                progress = { ((player.playerPoint * 1f - pointToInit) / (pointToFinish - pointToInit)) },
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 24.dp, end = 12.dp),
@@ -725,8 +789,8 @@ fun ItemViewPoint(
 
             EmoticonPlayer(
                 modifier = Modifier.size(50.dp),
-                finishToWin = game.finishToWin,
-                pointToFinish = game.pointToFinish,
+                finishToWin = finishToWin,
+                pointToFinish = pointToFinish,
                 player = player,
             )
         } else {
@@ -738,7 +802,7 @@ fun ItemViewPoint(
 @Composable
 fun ScoreCircleBox(
     modifier: Modifier,
-    finishToWin: Boolean = true,
+    finishToWin: Boolean?,
     victoriesVisibility: Boolean = true,
     victories: Int,
     score: Int,
@@ -746,7 +810,7 @@ fun ScoreCircleBox(
     BadgedBox(
         badge = {
             if (victoriesVisibility) {// && victories > 0
-                BadgedBoxScore(victories, finishToWin)
+                BadgedBoxScore(victories, finishToWin ?: false)
             }
         },
         content = {
@@ -772,7 +836,9 @@ fun BadgedBoxScore(victories: Int, finishToWin: Boolean) { //Badge (probar)
         Text(text = "$victories", fontSize = 16.sp)
         Image(
             modifier = Modifier.size(16.dp),
-            painter = if (finishToWin) painterResource(id = R.drawable.cup_winner) else painterResource(id = R.drawable.sad_loser),
+            painter = if (finishToWin) painterResource(id = R.drawable.cup_winner) else painterResource(
+                id = R.drawable.sad_loser
+            ),
             contentDescription = "",
         )
     }
@@ -781,13 +847,13 @@ fun BadgedBoxScore(victories: Int, finishToWin: Boolean) { //Badge (probar)
 @Composable
 fun EmoticonPlayer(
     modifier: Modifier = Modifier,
-    finishToWin: Boolean,
+    finishToWin: Boolean?,
     pointToFinish: Int,
     player: GenericoPlayerUi,
 ) {
 
-    if(player.playerPoint >= pointToFinish){
-        if (finishToWin){
+    if (player.playerPoint >= pointToFinish) {
+        if (finishToWin != null) {
             Image(
                 modifier = modifier,
                 painter = painterResource(id = R.drawable.cup_winner),
@@ -816,10 +882,10 @@ fun EmoticonPlayer(
 @Composable
 fun ChangeNumber(
     modifier: Modifier = Modifier,
-    title:String? = null,
-    value:Int = 0,
+    title: String? = null,
+    value: Int = 0,
     onValueChange: (Int) -> Unit
-){
+) {
     var numberAux by remember { mutableStateOf(value.toString()) }
     Column(
         modifier = modifier,
@@ -839,7 +905,7 @@ fun ChangeNumber(
                 numberAux = it
                 try {
                     onValueChange(it.toInt())
-                } catch (e:Exception){
+                } catch (e: Exception) {
                     Log.i(TAG, "ChangeNumber error: ${e.message}")
                 }
             },
@@ -850,7 +916,9 @@ fun ChangeNumber(
                             numberAux = value.dec().toString()
                             onValueChange(value.dec())
                         },
-                    tint = MaterialTheme.colorScheme.tertiary, imageVector = Icons.Default.KeyboardArrowDown, contentDescription = ""
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = ""
                 )
             },
             trailingIcon = {
@@ -860,12 +928,14 @@ fun ChangeNumber(
                             numberAux = value.inc().toString()
                             onValueChange(value.inc())
                         },
-                    tint = MaterialTheme.colorScheme.tertiary, imageVector = Icons.Default.KeyboardArrowUp, contentDescription = ""
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = ""
                 )
             },
             textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-            singleLine =  true,
-            colors =  TextFieldDefaults.colors(
+            singleLine = true,
+            colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = MaterialTheme.colorScheme.background,
                 focusedContainerColor = MaterialTheme.colorScheme.background,
             ),
@@ -875,21 +945,22 @@ fun ChangeNumber(
 
 
 @Composable
-fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit){
+fun DialogChangeName(onDismissRequest: () -> Unit, onChangeName: (String) -> Unit) {
     var name by remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
-        Card (
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .padding(horizontal = 16.dp)
                 .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
         ) {
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.background),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.background),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -901,7 +972,7 @@ fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit)
                         .padding(horizontal = 24.dp),
                     value = name,
                     onValueChange = {
-                        if (it.length <= 12){
+                        if (it.length <= 12) {
                             name = it
                         }
                     },

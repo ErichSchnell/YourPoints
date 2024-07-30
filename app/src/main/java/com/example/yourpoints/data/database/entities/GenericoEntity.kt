@@ -11,21 +11,20 @@ import com.google.gson.Gson
 
 @Entity(tableName = "generico_table")
 data class GenericoEntity(
-    @PrimaryKey val id:Int,
-    @ColumnInfo(name = "dataCreated") val dataCreated: String = "",
+    @PrimaryKey val id: Int,
 
-    @ColumnInfo(name = "name") val name: String = "",
+    @ColumnInfo(name = "dataCreated") val dataCreated: String,
 
-    @ColumnInfo(name = "withPoints") val withPoints:Boolean = false,
-    @ColumnInfo(name = "pointToInit") val pointToInit:Int = 0,
-    @ColumnInfo(name = "pointToFinish") val pointToFinish:Int = 100,
-    @ColumnInfo(name = "finishToWin") val finishToWin:Boolean = true,
+    @ColumnInfo(name = "name") val name: String,
 
-    @ColumnInfo(name = "withRounds") val withRounds:Boolean = false,
-    @ColumnInfo(name = "round") val round:Int = 10,
-    @ColumnInfo(name = "roundPlayed") val roundPlayed:Int = 1,
+    @ColumnInfo(name = "pointToInit") val pointToInit: Int,
+    @ColumnInfo(name = "pointToFinish") val pointToFinish: Int?,
+    @ColumnInfo(name = "finishToWin") val finishToWin: Boolean?,
 
-    @ColumnInfo(name = "player") val player:String
+    @ColumnInfo(name = "round") val round: Int?,
+    @ColumnInfo(name = "roundPlayed") val roundPlayed: Int,
+
+    @ColumnInfo(name = "player") val player: String
 )
 
 
@@ -33,13 +32,114 @@ fun GenericoDomain.toEntity() = GenericoEntity(
     id = id,
     dataCreated = dataCreated,
     name = name,
-    withPoints = withPoints,
     pointToInit = pointToInit,
     pointToFinish = pointToFinish,
     finishToWin = finishToWin,
-    withRounds = withRounds,
     round = round,
     roundPlayed = roundPlayed,
     player = Gson().toJson(player),
 )
+/*
+TableInfo{
+    name='generico_table',
+    columns={
+        id=Column{
+            name='id',
+            type='INTEGER',
+            affinity='3',
+            notNull=true,
+            primaryKeyPosition=1,
+            defaultValue='undefined'
+        },
+        dataCreated=Column{
+            name='dataCreated',
+            type='TEXT',
+            affinity='2',
+            notNull=true,
+            primaryKeyPosition=0,
+            defaultValue='undefined'
+        },
+        name=Column{
+            name='name',
+            type='TEXT',
+            affinity='2',
+            notNull=true,
+            primaryKeyPosition=0,
+            defaultValue='undefined'
+        },
+        pointToInit=Column{
+            name='pointToInit',
+            type='INTEGER',
+            affinity='3',
+            notNull=true,
+            primaryKeyPosition=0,
+            defaultValue='undefined'
+        },
+        pointToFinish=Column{
+            name='pointToFinish',
+            type='INTEGER',
+            affinity='3',
+            notNull=false,
+            primaryKeyPosition=0,
+            defaultValue='undefined'
+        },
+        finishToWin=Column{
+            name='finishToWin',
+            type='BOOLEAN',
+            affinity='1',
+            notNull=false,
+            primaryKeyPosition=0,
+            defaultValue='undefined'
+        },
+        round=Column{
+            name='round',
+            type='INTEGER',
+            affinity='3',
+            notNull=false,
+            primaryKeyPosition=0,
+            defaultValue='undefined'
+        },
+        roundPlayed=Column{
+            name='roundPlayed',
+            type='INTEGER',
+            affinity='3',
+            notNull=true,
+            primaryKeyPosition=0,
+            defaultValue='undefined'
+        },
+        player=Column{
+            name='player',
+            type='TEXT',
+            affinity='2',
+            notNull=true,
+            primaryKeyPosition=0,
+            defaultValue='undefined'
+        }
+    },
+    foreignKeys=[],
+    indices=[]
+}
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

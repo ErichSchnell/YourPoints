@@ -13,16 +13,14 @@ data class GenericoDomain (
 
     val name: String,
 
-    val withPoints:Boolean,
     val pointToInit:Int,
-    val pointToFinish:Int,
-    val finishToWin:Boolean,
+    val pointToFinish:Int?,
+    val finishToWin:Boolean?,
 
-    val withRounds:Boolean,
-    val round:Int,
+    val round:Int?,
     val roundPlayed:Int,
 
-    val player:MutableList<GenericoPlayerDomain> = mutableListOf()
+    val player:List<GenericoPlayerDomain> = mutableListOf()
 )
 
 data class GenericoPlayerDomain(
@@ -38,11 +36,9 @@ fun GenericoEntity.toDomain() :GenericoDomain{
         id = id,
         dataCreated = dataCreated,
         name = name,
-        withPoints = withPoints,
         pointToInit = pointToInit,
         pointToFinish = pointToFinish,
         finishToWin = finishToWin,
-        withRounds = withRounds,
         roundPlayed = roundPlayed,
         round = round,
         player = Gson().fromJson(player, listType),
@@ -53,14 +49,12 @@ fun GenericoUi.toDomain() = GenericoDomain(
     id = id,
     dataCreated = dataCreated,
     name = name,
-    withPoints = withPoints,
     pointToInit = pointToInit,
     pointToFinish = pointToFinish,
     finishToWin = finishToWin,
-    withRounds = withRounds,
     round = roundMax,
     roundPlayed = roundPlayed,
-    player = player.map { it.toDomain() }.toMutableList(),
+    player = player.map { it.toDomain() },
 )
 
 fun GenericoPlayerUi.toDomain() = GenericoPlayerDomain(
