@@ -399,9 +399,10 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
                             .padding(horizontal = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
 
                     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(imageVector = Icons.Default.Refresh, contentDescription = "")
+//                        Icon(imageVector = Icons.Default.Refresh, contentDescription = "")
+                        Icon(painter = painterResource(id = R.drawable.ic_rounds), contentDescription = "")
                         Text(
-                            text = if(game.withRounds) "${game.roundPlayed}/${game.roundMax}" else "-",
+                            text = if (game.withRounds) "${game.roundPlayed}/${game.roundMax}" else "-",
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )

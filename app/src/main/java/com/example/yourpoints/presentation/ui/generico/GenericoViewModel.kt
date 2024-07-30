@@ -34,6 +34,13 @@ class GenericoViewModel @Inject constructor(
     private val _game = MutableStateFlow<GenericoUi>(GenericoUi())
     val game:StateFlow<GenericoUi> = _game
 
+    private val _loading = MutableStateFlow(false)
+    val loading:StateFlow<Boolean> = _loading
+
+
+    private val _playerSelected = MutableStateFlow<GenericoPlayerUi?>(null)
+    val playerSelected:StateFlow<GenericoPlayerUi?> = _playerSelected
+
     fun initGenerico(gameId: Int) {
         if (gameId == 0){
             _uiState.value = GenericoUiState.CREATE
@@ -114,6 +121,12 @@ class GenericoViewModel @Inject constructor(
     fun updateNames(names: List<String>) {
         var index = 0
 
+        for(i in names.indices){
+            for(j in i+1 until names.size){
+                if (names[i] == names[j]) return
+            }
+        }
+
         _game.value = _game.value.setPlayers(
             _game.value.player.map { it.setName(names[index++]) }
         )
@@ -160,8 +173,7 @@ class GenericoViewModel @Inject constructor(
     }
     private fun updateRoomGame(){
         Log.i(TAG, "updateGenericoGame: listorti")
-        val valueAux = _uiState.value
-        _uiState.value = GenericoUiState.LOADING
+        _loading.value = true
         viewModelScope.launch {
             withContext(Dispatchers.IO){
                 try {
@@ -170,7 +182,7 @@ class GenericoViewModel @Inject constructor(
                     Log.i(TAG, "updateGenericoGame room: No se actualizo game")
                     Log.i(TAG, "updateGenericoGame error: ${e.message}")
                 }
-                _uiState.value = valueAux
+                _loading.value = false
             }
         }
     }
@@ -198,16 +210,41 @@ class GenericoViewModel @Inject constructor(
         updateRoomGame()
     }
 
-    fun deletePLayer(player: GenericoPlayerUi) {
+    fun deletePLayer() {
+        if(_playerSelected.value == null) return
+
         val players = _game.value.player
 
-        if (players.remove(player)){
+        if (players.remove(_playerSelected.value)){
             _game.value = _game.value.setPlayers(players.toList())
             updateRoomGame()
         } else {
             Log.i(TAG, "deletePLayer: error")
         }
 
+        _playerSelected.value = null
+
+    }
+
+    fun changeName(name:String) {
+        if(_playerSelected.value == null) return
+
+        _game.value.player.map {playerAux ->
+            if (playerAux.playerName == name) return
+        }
+        val players = _game.value.player.map {playerAux ->
+            if (playerAux.playerName == _playerSelected.value!!.playerName){
+                playerAux.copy(playerName = name)
+            } else {
+                playerAux
+            }
+        }
+        _game.value = _game.value.setPlayers(players.toList())
+        updateRoomGame()
+
+    }
+    fun setPlayerSelected(player: GenericoPlayerUi?) {
+        _playerSelected.value = player
     }
 }
 

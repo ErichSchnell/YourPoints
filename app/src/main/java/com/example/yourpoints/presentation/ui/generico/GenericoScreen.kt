@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -12,15 +13,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +29,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -66,6 +66,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.yourpoints.R
 import com.example.yourpoints.presentation.model.GenericoPlayerUi
@@ -81,6 +82,11 @@ fun GenericoScreen(
     val context = LocalContext.current
     val uiState by genericoViewModel.uiState.collectAsState()
     val game by genericoViewModel.game.collectAsState()
+    val loading by genericoViewModel.loading.collectAsState()
+
+    var showDialogChangeName by remember { mutableStateOf( false) }
+
+    val playerSelected by genericoViewModel.playerSelected.collectAsState()
 
 
     LaunchedEffect(true){
@@ -119,6 +125,7 @@ fun GenericoScreen(
             }
         )
 
+
         GenericoUiState.VIEW_POINTS -> ViewPoints(
             modifier = Modifier.fillMaxSize(),
             game = game,
@@ -131,10 +138,36 @@ fun GenericoScreen(
             onAddPlayer = {
                 genericoViewModel.addPLayer()
             },
-            onDeletePlayer = { player ->
-                genericoViewModel.deletePLayer(player)
+            onLongPress = { player ->
+                Log.i(TAG, "player: $player")
+                genericoViewModel.setPlayerSelected(player)
             }
         )
+    }
+    if (loading){
+        Loading(Modifier.fillMaxSize())
+    }
+    if(playerSelected != null){
+        Log.i(TAG, "playerSelected: $playerSelected")
+        Dialog(onDismissRequest = { genericoViewModel.setPlayerSelected(null) }) {
+            Column {
+                TextButton(onClick = {
+                    showDialogChangeName = true
+                }) {
+                    Text(text = "Change Name")
+                }
+                TextButton(onClick = {
+                    genericoViewModel.deletePLayer()
+                }) {
+                    Text(text = "Delete")
+                }
+            }
+        }
+    }
+    if (showDialogChangeName){
+        DialogChangeName(onDismissRequest = { showDialogChangeName = false }){
+            genericoViewModel.changeName(it)
+        }
     }
 }
 
@@ -468,7 +501,6 @@ fun SetPoints(
         newPoints.add(it.playerPoint)
     }
 
-
     Column(modifier = modifier) {
 
         game.player.forEach{ player ->
@@ -553,7 +585,7 @@ fun ViewPoints(
     onClickViewChange:() -> Unit,
     onClickResetGame:() -> Unit,
     onAddPlayer:() -> Unit,
-    onDeletePlayer:(GenericoPlayerUi) -> Unit,
+    onLongPress:(GenericoPlayerUi) -> Unit,
 ){
     Column(modifier = modifier) {
 
@@ -583,19 +615,21 @@ fun ViewPoints(
             }
         }
 
-        game.player.forEach {
+        game.player.forEach { player ->
             ItemViewPoint(
                 modifier = Modifier.fillMaxWidth(),
                 game = game,
-                onLongPress = onDeletePlayer,
-                player = it
+                onLongPress = {
+                    Log.i(TAG, "player name: ${player.playerName}")
+                    onLongPress(player)
+              },
+                player = player
             )
             HorizontalDivider()
         }
         AddPlayer(onAddPlayer)
 
         Spacer(modifier = Modifier.weight(1f))
-
 
         Row(
             Modifier
@@ -629,7 +663,9 @@ fun ViewPoints(
 @Composable
 fun AddPlayer(onAddPlayer:() -> Unit){
     Row (
-        modifier = Modifier.fillMaxWidth().height(100.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically) {
         Text(
@@ -643,15 +679,21 @@ fun ItemViewPoint(
     modifier:Modifier = Modifier,
     game: GenericoUi,
     player:GenericoPlayerUi,
-    onLongPress:(GenericoPlayerUi) -> Unit,
+    onLongPress:() -> Unit,
 ){
+    Log.i(TAG, "player name into: ${player.playerName}")
     Row(
-        modifier = modifier.padding(8.dp).pointerInput(Unit) {
+        modifier = modifier
+            .padding(8.dp)
+            .pointerInput(Unit) {
                 detectTapGestures(
-                    onLongPress = { onLongPress(player) },
+                    onLongPress = {
+                        onLongPress()
+                    },
                 )
-        },
-        verticalAlignment = Alignment.CenterVertically) {
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
 
         ScoreCircleBox(
             modifier = Modifier.size(50.dp),
@@ -828,6 +870,74 @@ fun ChangeNumber(
                 focusedContainerColor = MaterialTheme.colorScheme.background,
             ),
         )
+    }
+}
+
+
+@Composable
+fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit){
+    var name by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card (
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .padding(horizontal = 16.dp)
+                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+        ) {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.background),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    label = { Text(text = "New Name", color = MaterialTheme.colorScheme.tertiary) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    value = name,
+                    onValueChange = {
+                        if (it.length <= 12){
+                            name = it
+                        }
+                    },
+                    maxLines = 1,
+                    singleLine = true,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        cursorColor = MaterialTheme.colorScheme.primary,
+                        focusedTextColor = MaterialTheme.colorScheme.primary,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.tertiary
+                    )
+                )
+
+                Button(
+                    modifier = Modifier.padding(24.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    onClick = {
+                        onChangeName(name)
+                    },
+                    enabled = name.isNotEmpty()
+                ) {
+                    Text(text = "Update Name")
+                }
+            }
+        }
+
     }
 }
 
