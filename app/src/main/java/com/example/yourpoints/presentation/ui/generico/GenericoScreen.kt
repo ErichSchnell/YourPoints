@@ -3,10 +3,12 @@ package com.example.yourpoints.presentation.ui.generico
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -84,8 +86,7 @@ fun GenericoScreen(
     val game by genericoViewModel.game.collectAsState()
     val loading by genericoViewModel.loading.collectAsState()
 
-    var showDialogChangeName by remember { mutableStateOf( false) }
-
+    val showDialogChangeName by genericoViewModel.showDialogChangeName.collectAsState()
     val playerSelected by genericoViewModel.playerSelected.collectAsState()
 
 
@@ -93,80 +94,84 @@ fun GenericoScreen(
         genericoViewModel.initGenerico(gameId)
     }
 
-    when(uiState){
-        GenericoUiState.LOADING -> Loading(Modifier.fillMaxSize())
+    Box(modifier = Modifier.fillMaxSize()){
+        when(uiState){
+            GenericoUiState.LOADING -> Loading(Modifier.fillMaxSize())
 
-        GenericoUiState.CREATE -> CreateGame(
-            modifier = Modifier.fillMaxSize(),
-            onClickCreateGame = { name, cantPlayers, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds ->
-                if (name.isNotEmpty())
-                    genericoViewModel.createGame(name, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds, cantPlayers)
-                else
-                    Toast.makeText(context, "Error: Set Name",Toast.LENGTH_SHORT).show()
-            }
-        )
-
-        GenericoUiState.SELECT_NAME -> SelectName(
-            modifier = Modifier.fillMaxSize(),
-            cantPlayers = game.player.size,
-            onValueChange = {
-                            genericoViewModel.updateNames(it)
-            },
-        )
-
-        GenericoUiState.SET_POINTS -> SetPoints(
-            modifier = Modifier.fillMaxSize(),
-            game = game,
-            onValueChange = {
-                genericoViewModel.updatePoints(it)
-            },
-            onAddPlayer = {
-                genericoViewModel.addPLayer()
-            }
-        )
-
-
-        GenericoUiState.VIEW_POINTS -> ViewPoints(
-            modifier = Modifier.fillMaxSize(),
-            game = game,
-            onClickViewChange = {
-                genericoViewModel.changeView()
-            },
-            onClickResetGame = {
-                genericoViewModel.resetGame()
-            },
-            onAddPlayer = {
-                genericoViewModel.addPLayer()
-            },
-            onLongPress = { player ->
-                Log.i(TAG, "player: $player")
-                genericoViewModel.setPlayerSelected(player)
-            }
-        )
-    }
-    if (loading){
-        Loading(Modifier.fillMaxSize())
-    }
-    if(playerSelected != null){
-        Log.i(TAG, "playerSelected: $playerSelected")
-        Dialog(onDismissRequest = { genericoViewModel.setPlayerSelected(null) }) {
-            Column {
-                TextButton(onClick = {
-                    showDialogChangeName = true
-                }) {
-                    Text(text = "Change Name")
+            GenericoUiState.CREATE -> CreateGame(
+                modifier = Modifier.fillMaxSize(),
+                onClickCreateGame = { name, cantPlayers, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds ->
+                    if (name.isNotEmpty())
+                        genericoViewModel.createGame(name, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds, cantPlayers)
+                    else
+                        Toast.makeText(context, "Error: Set Name",Toast.LENGTH_SHORT).show()
                 }
-                TextButton(onClick = {
-                    genericoViewModel.deletePLayer()
-                }) {
-                    Text(text = "Delete")
+            )
+
+            GenericoUiState.SELECT_NAME -> SelectName(
+                modifier = Modifier.fillMaxSize(),
+                cantPlayers = game.player.size,
+                onValueChange = {
+                    genericoViewModel.updateNames(it)
+                },
+            )
+
+            GenericoUiState.SET_POINTS -> SetPoints(
+                modifier = Modifier.fillMaxSize(),
+                game = game,
+                onValueChange = {
+                    genericoViewModel.updatePoints(it)
+                },
+                onAddPlayer = {
+                    genericoViewModel.addPLayer()
+                }
+            )
+
+
+            GenericoUiState.VIEW_POINTS -> {
+                ViewPoints(
+                    modifier = Modifier.fillMaxSize(),
+                    game = game,
+                    onClickViewChange = {
+                        genericoViewModel.changeView()
+                    },
+                    onClickResetGame = {
+                        genericoViewModel.resetGame()
+                    },
+                    onAddPlayer = {
+                        genericoViewModel.addPLayer()
+                    },
+                    onSelectPlayer = { player ->
+                        Log.i(TAG, "player: $player")
+                        genericoViewModel.setPlayerSelected(game.player.find { it.playerName == player })
+                    }
+                )
+            }
+        }
+        if (loading){
+            Loading(Modifier.fillMaxSize())
+        }
+        if(playerSelected != null){
+            Log.i(TAG, "playerSelected: $playerSelected")
+            Dialog(onDismissRequest = { genericoViewModel.setPlayerSelected(null) }) {
+                Column {
+                    TextButton(onClick = {
+                        genericoViewModel.setDialogChangeName(true)
+                    }) {
+                        Text(text = "Change Name")
+                    }
+                    TextButton(onClick = {
+                        genericoViewModel.deletePLayer()
+                    }) {
+                        Text(text = "Delete")
+                    }
                 }
             }
         }
-    }
-    if (showDialogChangeName){
-        DialogChangeName(onDismissRequest = { showDialogChangeName = false }){
-            genericoViewModel.changeName(it)
+        if (showDialogChangeName){
+            DialogChangeName(onDismissRequest = { genericoViewModel.setDialogChangeName(false) }){
+                genericoViewModel.changeName(it)
+            }
         }
     }
 }
@@ -585,8 +590,10 @@ fun ViewPoints(
     onClickViewChange:() -> Unit,
     onClickResetGame:() -> Unit,
     onAddPlayer:() -> Unit,
-    onLongPress:(GenericoPlayerUi) -> Unit,
+    onSelectPlayer:(String) -> Unit, //GenericoPlayerUi
 ){
+    var playerSelected by remember { mutableStateOf<String?>(null) }
+
     Column(modifier = modifier) {
 
         if (game.withRounds){
@@ -619,10 +626,11 @@ fun ViewPoints(
             ItemViewPoint(
                 modifier = Modifier.fillMaxWidth(),
                 game = game,
-                onLongPress = {
-                    Log.i(TAG, "player name: ${player.playerName}")
-                    onLongPress(player)
-              },
+                selected = player.playerName == playerSelected,
+                onSelectPlayer = {
+                    playerSelected = player.playerName
+                    onSelectPlayer(playerSelected.orEmpty())
+                },
                 player = player
             )
             HorizontalDivider()
@@ -674,24 +682,27 @@ fun AddPlayer(onAddPlayer:() -> Unit){
         )
     }
 }
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ItemViewPoint(
     modifier:Modifier = Modifier,
+    selected:Boolean,
     game: GenericoUi,
     player:GenericoPlayerUi,
-    onLongPress:() -> Unit,
+    onSelectPlayer:() -> Unit,
 ){
     Log.i(TAG, "player name into: ${player.playerName}")
     Row(
         modifier = modifier
             .padding(8.dp)
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onLongPress = {
-                        onLongPress()
-                    },
-                )
-            },
+            .combinedClickable(
+                onClick = { Log.i(TAG, "onTap: ${player.playerName}") },
+                onLongClick = {
+                    Log.i(TAG, "onLongPress: ${player.playerName}")
+                    onSelectPlayer()
+                }
+            )
+        ,
         verticalAlignment = Alignment.CenterVertically
     ) {
 

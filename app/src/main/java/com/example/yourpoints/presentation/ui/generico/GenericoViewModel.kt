@@ -41,6 +41,9 @@ class GenericoViewModel @Inject constructor(
     private val _playerSelected = MutableStateFlow<GenericoPlayerUi?>(null)
     val playerSelected:StateFlow<GenericoPlayerUi?> = _playerSelected
 
+    private val _showDialogChangeName = MutableStateFlow(false)
+    val showDialogChangeName:StateFlow<Boolean> = _showDialogChangeName
+
     fun initGenerico(gameId: Int) {
         if (gameId == 0){
             _uiState.value = GenericoUiState.CREATE
@@ -178,11 +181,12 @@ class GenericoViewModel @Inject constructor(
             withContext(Dispatchers.IO){
                 try {
                     updateGame(_game.value.toDomain())
+                    _loading.value = false
                 } catch (e:Exception){
                     Log.i(TAG, "updateGenericoGame room: No se actualizo game")
                     Log.i(TAG, "updateGenericoGame error: ${e.message}")
                 }
-                _loading.value = false
+
             }
         }
     }
@@ -198,7 +202,7 @@ class GenericoViewModel @Inject constructor(
     }
 
     fun addPLayer() {
-        val players = _game.value.player
+        val players = _game.value.player.toMutableList()
 
         players.add(
             GenericoPlayerUi(
@@ -213,11 +217,18 @@ class GenericoViewModel @Inject constructor(
     fun deletePLayer() {
         if(_playerSelected.value == null) return
 
-        val players = _game.value.player
+        val players = _game.value.player.toMutableList()
 
         if (players.remove(_playerSelected.value)){
             _game.value = _game.value.setPlayers(players.toList())
-            updateRoomGame()
+
+            viewModelScope.launch {
+                withContext(Dispatchers.IO){
+                    updateRoomGame()
+                }
+            }
+
+
         } else {
             Log.i(TAG, "deletePLayer: error")
         }
@@ -239,12 +250,21 @@ class GenericoViewModel @Inject constructor(
                 playerAux
             }
         }
+
         _game.value = _game.value.setPlayers(players.toList())
         updateRoomGame()
 
+        _playerSelected.value = null
+        _showDialogChangeName.value = false
+
     }
     fun setPlayerSelected(player: GenericoPlayerUi?) {
+        Log.i(TAG, "setPlayerSelected: $player")
         _playerSelected.value = player
+    }
+
+    fun setDialogChangeName(value: Boolean) {
+        _showDialogChangeName.value = value
     }
 }
 
