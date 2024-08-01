@@ -58,7 +58,7 @@ class GenericoViewModel @Inject constructor(
                 try {
                     _game.value = getGame(gameId)
                     Log.i(TAG, "Partida Encontrada. ID:$gameId")
-                    _uiState.value = GenericoUiState.VIEW_POINTS
+                    _uiState.value = GenericoUiState.GAME
 
                 } catch (e:Exception){
                     Log.i(TAG, "Partida No Encontrada. ID:$gameId")
@@ -134,7 +134,7 @@ class GenericoViewModel @Inject constructor(
             _game.value.player.map { it.setName(names[index++]) }
         )
 
-        _uiState.value = GenericoUiState.VIEW_POINTS
+        _uiState.value = GenericoUiState.GAME
 
         updateRoomGame()
     }
@@ -147,8 +147,7 @@ class GenericoViewModel @Inject constructor(
                 players = _game.value.player.map { it.setPoint(points[index++])}
             )
             .incRound()
-
-        _uiState.value = GenericoUiState.VIEW_POINTS
+            .setPoint(false)
 
         verifyPlayerReachedGoal()
 
@@ -192,8 +191,9 @@ class GenericoViewModel @Inject constructor(
     }
 
 
-    fun changeView() {
-        _uiState.value = GenericoUiState.SET_POINTS
+    fun changeViewSetPoints() {
+        _game.value = _game.value.setPoint(true)
+        Log.i(TAG, "changeViewSetPoints: ${_game.value.isSetPoint}")
     }
 
     fun resetGame() {
@@ -272,6 +272,5 @@ sealed class GenericoUiState(){
     object LOADING: GenericoUiState()
     object CREATE: GenericoUiState()
     object SELECT_NAME: GenericoUiState()
-    object SET_POINTS: GenericoUiState()
-    object VIEW_POINTS: GenericoUiState()
+    object GAME: GenericoUiState()
 }

@@ -6,6 +6,7 @@ import com.example.yourpoints.domain.model.GenericoPlayerDomain
 
 data class GenericoUi(
     val id:Int = 0,
+    val isSetPoint:Boolean = false,
     val dataCreated: String = "",
     val selected:Boolean = false,
 
@@ -23,6 +24,9 @@ data class GenericoUi(
 
     val player:List<GenericoPlayerUi> = emptyList()
 ) {
+    fun setPoint(value:Boolean) = this.copy(
+        isSetPoint = value
+    )
     fun changeSelect() = this.copy(
         selected = !selected
     )

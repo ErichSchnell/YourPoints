@@ -9,7 +9,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,7 +60,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -98,42 +96,66 @@ fun GenericoScreen(
         when(uiState){
             GenericoUiState.LOADING -> Loading(Modifier.fillMaxSize())
 
-            GenericoUiState.CREATE -> CreateGame(
-                modifier = Modifier.fillMaxSize(),
-                onClickCreateGame = { name, cantPlayers, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds ->
-                    if (name.isNotEmpty())
-                        genericoViewModel.createGame(name, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds, cantPlayers)
-                    else
-                        Toast.makeText(context, "Error: Set Name",Toast.LENGTH_SHORT).show()
-                }
-            )
+            GenericoUiState.CREATE -> {
+                CreateGame(
+                    modifier = Modifier.fillMaxSize(),
+                    onClickCreateGame = { name, cantPlayers, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds ->
+                        if (name.isNotEmpty())
+                            genericoViewModel.createGame(
+                                name,
+                                pointFlag,
+                                pointInit,
+                                pointFinish,
+                                finishToWin,
+                                roundFlag,
+                                rounds,
+                                cantPlayers
+                            )
+                        else
+                            Toast.makeText(context, "Error: Set Name", Toast.LENGTH_SHORT).show()
+                    }
+                )
+            }
 
-            GenericoUiState.SELECT_NAME -> SelectName(
-                modifier = Modifier.fillMaxSize(),
-                cantPlayers = game.player.size,
-                onValueChange = {
-                    genericoViewModel.updateNames(it)
-                },
-            )
+            GenericoUiState.SELECT_NAME -> {
+                SelectName(
+                    modifier = Modifier.fillMaxSize(),
+                    cantPlayers = game.player.size,
+                    onValueChange = { newNames ->
+                        genericoViewModel.updateNames(newNames)
+                    },
+                )
+            }
 
-            GenericoUiState.SET_POINTS -> SetPoints(
-                modifier = Modifier.fillMaxSize(),
-                game = game,
-                onValueChange = {
-                    genericoViewModel.updatePoints(it)
-                },
-                onAddPlayer = {
-                    genericoViewModel.addPLayer()
-                }
-            )
-
+            GenericoUiState.GAME -> {
+                Game(
+                    game = game,
+                    onAddPlayer = { genericoViewModel.addPLayer() },
+                    onValueChange = { genericoViewModel.updatePoints(it) },
+                    onClickChangeViewSetPoints = { genericoViewModel.changeViewSetPoints() },
+                    onClickResetGame = { genericoViewModel.resetGame() },
+                    onSelectPlayer = { player -> genericoViewModel.setPlayerSelected(player) },
+                )
+            }
+            /*GenericoUiState.SET_POINTS -> {
+                SetPoints(
+                    modifier = Modifier.fillMaxSize(),
+                    game = game,
+                    onValueChange = {
+                        genericoViewModel.updatePoints(it)
+                    },
+                    onAddPlayer = {
+                        genericoViewModel.addPLayer()
+                    }
+                )
+            }
 
             GenericoUiState.VIEW_POINTS -> {
                 ViewPoints(
                     modifier = Modifier.fillMaxSize(),
                     game = game,
-                    onClickViewChange = {
-                        genericoViewModel.changeView()
+                    onClickChangeViewSetPoints = {
+                        genericoViewModel.changeViewSetPoints()
                     },
                     onClickResetGame = {
                         genericoViewModel.resetGame()
@@ -142,11 +164,16 @@ fun GenericoScreen(
                         genericoViewModel.addPLayer()
                     },
                     onSelectPlayer = { player ->
-                        Log.i(TAG, "player: $player")
                         genericoViewModel.setPlayerSelected(game.player.find { it.playerName == player })
-                    }
+                    },
+//                    onDeletePlayer = {
+//
+//                    },
+//                    onChangeNamePlayer = {
+//
+//                    },
                 )
-            }
+            }*/
         }
         if (loading){
             Loading(Modifier.fillMaxSize())
@@ -492,257 +519,218 @@ fun PrototypePlayer(
     }
 }
 
-@Composable
-fun SetPoints(
-    modifier: Modifier = Modifier,
-    game: GenericoUi,
-    onValueChange: (List<Int>) -> Unit,
-    onAddPlayer:() -> Unit
-){
 
+@Composable
+fun Game(
+    game:GenericoUi,
+    onAddPlayer: ()-> Unit,
+    onValueChange:(List<Int>) -> Unit,
+    onClickChangeViewSetPoints:() -> Unit,
+    onClickResetGame:() -> Unit,
+    onSelectPlayer:(GenericoPlayerUi) -> Unit,
+){
     val newPoints by remember { mutableStateOf( mutableListOf<Int>() ) }
 
-    game.player.forEach {
-        newPoints.add(it.playerPoint)
-    }
-
-    Column(modifier = modifier) {
-
-        game.player.forEach{ player ->
-            ItemSetPoint(
-                modifier = Modifier.fillMaxWidth(),
-                game = game,
-                player = player,
-                onPointChahnge = {
-                    newPoints[game.player.indexOf(player)] = it
-                }
-            )
-            HorizontalDivider()
-        }
-        AddPlayer(onAddPlayer)
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        FloatingActionButton(modifier = Modifier
-            .padding(24.dp)
-            .align(Alignment.End), onClick = {
-                onValueChange(newPoints)
-                newPoints.clear()
-            }) {
-            Icon(
-                imageVector = Icons.Default.PlayArrow,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
+    if (newPoints.size != game.player.size){
+        newPoints.clear()
+        game.player.forEach {
+            newPoints.add(it.playerPoint)
         }
     }
-}
-@Composable
-fun ItemSetPoint(
-    modifier:Modifier = Modifier,
-    game:GenericoUi,
-    player:GenericoPlayerUi,
-    onPointChahnge:(Int) -> Unit
-){
-    var point by remember { mutableIntStateOf(0) }
 
-    Row(modifier = modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+    Log.i(TAG, "Game: newPoints: $newPoints")
+    
+    Column(modifier = Modifier.fillMaxSize()){
+        RoundsPlayed(game.withRounds, game.roundPlayed, game.roundMax)
 
-        ScoreCircleBox(
-            modifier = Modifier.size(50.dp),
-            victories = player.victories,
-            score =  player.playerPoint + point,
-            victoriesVisibility = game.withPoints,
+        ListPlayer(
+            isSetPoint = game.isSetPoint,
+            players = game.player,
             finishToWin = game.finishToWin,
+            withPoints = game.withPoints,
+            pointToInit = game.pointToInit,
+            pointToFinish = game.pointToFinish,
+
+            onPointChange = { player, newPoint ->
+                newPoints[game.player.indexOf(player)] = newPoint
+                Log.i(TAG, "Game: newPoints: $newPoints")
+            },
+            onSelectPlayer = onSelectPlayer
         )
 
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Text(
-            modifier = Modifier.width(100.dp),
-            text = player.playerName,
-            fontSize = 24.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        ChangeNumber(
-            modifier = Modifier
-                .height(50.dp)
-                .width(150.dp),
-            value = point,
-            onValueChange = {
-                point = it
-                onPointChahnge(player.playerPoint + point)
-            }
-        )
-
-    }
-}
-
-
-@Composable
-fun ViewPoints(
-    modifier: Modifier = Modifier,
-    game: GenericoUi,
-    onClickViewChange:() -> Unit,
-    onClickResetGame:() -> Unit,
-    onAddPlayer:() -> Unit,
-    onSelectPlayer:(String) -> Unit, //GenericoPlayerUi
-){
-    var playerSelected by remember { mutableStateOf<String?>(null) }
-
-    Column(modifier = modifier) {
-
-        if (game.withRounds){
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        if (game.roundPlayed <= game.roundMax) {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        } else {
-                            MaterialTheme.colorScheme.error
-                        }
-                    ),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Round: ${game.roundPlayed} de ${game.roundMax}",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = if(game.roundPlayed <= game.roundMax){
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    } else {
-                        MaterialTheme.colorScheme.onError
-                    }
-                )
-            }
-        }
-
-        game.player.forEach { player ->
-            ItemViewPoint(
-                modifier = Modifier.fillMaxWidth(),
-                game = game,
-                selected = player.playerName == playerSelected,
-                onSelectPlayer = {
-                    playerSelected = player.playerName
-                    onSelectPlayer(playerSelected.orEmpty())
-                },
-                player = player
-            )
-            HorizontalDivider()
-        }
         AddPlayer(onAddPlayer)
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(24.dp)) {
-            if (game.finished || game.roundPlayed > game.roundMax){
-                FloatingActionButton(
-                    onClick = { onClickResetGame() }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            FloatingActionButton(
-                onClick = { onClickViewChange() }) {
+        if (game.isSetPoint){
+            FloatingActionButton(modifier = Modifier
+                .padding(24.dp)
+                .align(Alignment.End), onClick = {
+                onValueChange(newPoints)
+            }) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
             }
+        } else {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp) ) {
+                if (game.finished || game.roundPlayed > game.roundMax){
+                    FloatingActionButton(
+                        onClick = { onClickResetGame() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                FloatingActionButton(
+                    onClick = { onClickChangeViewSetPoints() }) {
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
         }
     }
 }
 @Composable
-fun AddPlayer(onAddPlayer:() -> Unit){
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            modifier = Modifier.clickable { onAddPlayer() },
-            text = "Add New Player..."
+fun RoundsPlayed(withRounds: Boolean, roundPlayed: Int, roundMax: Int, ){
+    if (withRounds){
+        val backgroundColor = if (roundPlayed <= roundMax) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.error
+        val contentColor = if (roundPlayed <= roundMax) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onError
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(backgroundColor),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Round: $roundPlayed de $roundMax",
+                style = MaterialTheme.typography.titleLarge,
+                color = contentColor
+            )
+        }
+    }
+}
+@Composable
+fun ListPlayer(
+    isSetPoint: Boolean,
+    players: List<GenericoPlayerUi>,
+    finishToWin: Boolean,
+    withPoints: Boolean,
+    pointToInit: Int,
+    pointToFinish: Int,
+
+    onPointChange:(GenericoPlayerUi, Int) -> Unit,
+    onSelectPlayer:(GenericoPlayerUi) -> Unit
+){
+    players.forEach { player ->
+        CardPlayer(
+            player,
+            isSetPoint,
+            finishToWin,
+            withPoints,
+            pointToInit,
+            pointToFinish,
+            onPointChahnge = { newPoint ->
+                onPointChange(player, newPoint)
+            },
+            onSelectPlayer = onSelectPlayer
         )
+        HorizontalDivider()
     }
 }
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ItemViewPoint(
-    modifier:Modifier = Modifier,
-    selected:Boolean,
-    game: GenericoUi,
-    player:GenericoPlayerUi,
-    onSelectPlayer:() -> Unit,
+fun CardPlayer(
+    player: GenericoPlayerUi,
+    isSetPoint: Boolean,
+    finishToWin: Boolean,
+    withPoints: Boolean,
+    pointToInit: Int,
+    pointToFinish: Int,
+    onPointChahnge:(Int) -> Unit,
+    onSelectPlayer:(GenericoPlayerUi) -> Unit,
 ){
-    Log.i(TAG, "player name into: ${player.playerName}")
+    var point by remember { mutableIntStateOf(0) }
+    if (!isSetPoint) point = 0
+
     Row(
-        modifier = modifier
-            .padding(8.dp)
-            .combinedClickable(
-                onClick = { Log.i(TAG, "onTap: ${player.playerName}") },
-                onLongClick = {
-                    Log.i(TAG, "onLongPress: ${player.playerName}")
-                    onSelectPlayer()
-                }
-            )
-        ,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
         ScoreCircleBox(
             modifier = Modifier.size(50.dp),
-            finishToWin = game.finishToWin,
-            victoriesVisibility = game.withPoints,
+            finishToWin = finishToWin,
+            victoriesVisibility = withPoints,
             victories = player.victories,
-            score =  player.playerPoint
+            score = player.playerPoint + point
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
         Text(
-            modifier = Modifier.width(100.dp),
+            modifier = Modifier
+                .width(100.dp)
+                .combinedClickable(onClick = {}, onLongClick = { onSelectPlayer(player) }),
             text = player.playerName,
             fontSize = 24.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
 
-        if (game.withPoints){
-            LinearProgressIndicator(
-                progress = { ((player.playerPoint * 1f - game.pointToInit) / (game.pointToFinish - game.pointToInit)) },
+        if (isSetPoint){
+            Spacer(modifier = Modifier.weight(1f))
+            ChangeNumber(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 24.dp, end = 12.dp),
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.onPrimary,
-            )
-
-            EmoticonPlayer(
-                modifier = Modifier.size(50.dp),
-                finishToWin = game.finishToWin,
-                pointToFinish = game.pointToFinish,
-                player = player,
+                    .height(50.dp)
+                    .width(150.dp),
+                value = point,
+                onValueChange = {
+                    point = it
+                    onPointChahnge(player.playerPoint + point)
+                }
             )
         } else {
-            Spacer(modifier = Modifier.weight(1f))
+            if (withPoints){
+                LinearProgressIndicator(
+                    progress = { ((player.playerPoint * 1f - pointToInit) / (pointToFinish - pointToInit)) },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 24.dp, end = 12.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.onPrimary,
+                )
+
+                EmoticonPlayer(
+                    modifier = Modifier.size(50.dp),
+                    finishToWin = finishToWin,
+                    pointToFinish = pointToFinish,
+                    player = player,
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
+            }
         }
+
     }
 }
 
@@ -824,6 +812,22 @@ fun EmoticonPlayer(
 
 }
 
+
+
+@Composable
+fun AddPlayer(onAddPlayer:() -> Unit){
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            modifier = Modifier.clickable { onAddPlayer() },
+            text = "Add New Player..."
+        )
+    }
+}
 @Composable
 fun ChangeNumber(
     modifier: Modifier = Modifier,

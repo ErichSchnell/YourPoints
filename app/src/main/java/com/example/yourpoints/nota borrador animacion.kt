@@ -1,5 +1,72 @@
 package com.example.yourpoints
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.yourpoints.presentation.ui.generico.ChangeNumber
+import com.example.yourpoints.presentation.ui.generico.ScoreCircleBox
+
+/*
+
+            .combinedClickable(
+                onLongClick = {
+                    Log.i(TAG, "onLongPress: ${player.playerName}")
+                    onSelectPlayer()
+                }
+            )
+ */
+
+
+/*
+Row(
+modifier = modifier.padding(8.dp),
+verticalAlignment = Alignment.CenterVertically
+) {
+
+    ScoreCircleBox(
+        modifier = Modifier.size(50.dp),
+        finishToWin = game.finishToWin,
+        victoriesVisibility = game.withPoints,
+        victories = player.victories,
+        score =  player.playerPoint + point,
+    )
+
+    Spacer(modifier = Modifier.width(8.dp))
+
+    Text(
+        modifier = Modifier.width(100.dp),
+        text = player.playerName,
+        fontSize = 24.sp,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center
+    )
+
+
+
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
 @Composable
 fun AnimatedTextSwitcher() {
