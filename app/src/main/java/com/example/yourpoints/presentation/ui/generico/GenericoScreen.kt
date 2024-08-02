@@ -87,11 +87,11 @@ fun GenericoScreen(
     genericoViewModel: GenericoViewModel = hiltViewModel(),
     gameId:Int
 ){
-    val context = LocalContext.current
     val uiState by genericoViewModel.uiState.collectAsState()
     val game by genericoViewModel.game.collectAsState()
     val loading by genericoViewModel.loading.collectAsState()
 
+    val showToast by genericoViewModel.showToast.collectAsState()
     val showDialogChangeName by genericoViewModel.showDialogChangeName.collectAsState()
     val playerSelected by genericoViewModel.playerSelected.collectAsState()
 
@@ -108,19 +108,7 @@ fun GenericoScreen(
                 CreateGame(
                     modifier = Modifier.fillMaxSize(),
                     onClickCreateGame = { name, cantPlayers, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds ->
-                        if (name.isNotEmpty())
-                            genericoViewModel.createGame(
-                                name,
-                                pointFlag,
-                                pointInit,
-                                pointFinish,
-                                finishToWin,
-                                roundFlag,
-                                rounds,
-                                cantPlayers
-                            )
-                        else
-                            Toast.makeText(context, "Error: Set Name", Toast.LENGTH_SHORT).show()
+                        genericoViewModel.createGame(name, pointFlag, pointInit, pointFinish, finishToWin, roundFlag, rounds, cantPlayers)
                     }
                 )
             }
@@ -150,66 +138,21 @@ fun GenericoScreen(
             Loading(Modifier.fillMaxSize())
         }
         if(playerSelected != null && !showDialogChangeName){
-            Dialog(onDismissRequest = { genericoViewModel.setPlayerSelected(null) }) {
-                Card (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .padding(horizontal = 16.dp)
-                        .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
-                ) {
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.background),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = string_generico_setting,
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Button(
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            ),
-                            onClick = {
-                                genericoViewModel.setDialogChangeName(true)
-                            },
-                        ) {
-                            Text(text = "Change Name")
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Button(
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            ),
-                            onClick = {
-                                genericoViewModel.deletePLayer()
-                            },
-
-                        ) {
-                            Text(text = "Delete Player")
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                    }
-                }
-            }
+            DialogSettingPlayer(
+                onDismissRequest = { genericoViewModel.setPlayerSelected(null) },
+                onSetDialogChangeName = { genericoViewModel.setDialogChangeName(true) },
+                onDeletePLayer = { genericoViewModel.deletePLayer() }
+            )
         }
         if (showDialogChangeName){
             DialogChangeName(onDismissRequest = { genericoViewModel.setDialogChangeName(false) }){
                 genericoViewModel.changeName(it)
             }
         }
+    }
+
+    ShowToast(text = showToast){
+        genericoViewModel.clearToast()
     }
 }
 
@@ -848,7 +791,6 @@ fun ChangeNumber(
     onValueChange: (Int) -> Unit
 ){
     var numberAux by remember { mutableStateOf(TextFieldValue(value.toString())) }
-//    var numberAux by remember { mutableStateOf(value.toString()) }
     var hasFocus by remember { mutableStateOf(false) }
 
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
@@ -923,7 +865,67 @@ fun ChangeNumber(
     }
 }
 
+@Composable
+fun DialogSettingPlayer(
+    onDismissRequest: () -> Unit,
+    onSetDialogChangeName: () -> Unit,
+    onDeletePLayer: () -> Unit
+) {
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card (
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .padding(horizontal = 16.dp)
+                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+        ) {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.background),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Spacer(modifier = Modifier.height(8.dp))
 
+                Text(
+                    text = string_generico_setting,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    onClick = {
+                        onSetDialogChangeName()
+                    },
+                ) {
+                    Text(text = "Change Name")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    onClick = {
+                        onDeletePLayer()
+                    },
+
+                    ) {
+                    Text(text = "Delete Player")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+            }
+        }
+    }
+}
 @Composable
 fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit){
     var name by remember { mutableStateOf("") }
@@ -988,6 +990,14 @@ fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit)
             }
         }
 
+    }
+}
+@Composable
+fun ShowToast(text: String, clearToast:() -> Unit) {
+    val context = LocalContext.current
+    if (text.isNotEmpty()){
+        Toast.makeText(context, "Error: Set Name", Toast.LENGTH_SHORT).show()
+        clearToast()
     }
 }
 

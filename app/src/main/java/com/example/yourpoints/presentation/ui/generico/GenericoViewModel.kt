@@ -9,6 +9,8 @@ import com.example.yourpoints.domain.annotatorGenerico.UpdateGenericoGameUseCase
 import com.example.yourpoints.domain.model.toDomain
 import com.example.yourpoints.presentation.model.GenericoPlayerUi
 import com.example.yourpoints.presentation.model.GenericoUi
+import com.example.yourpoints.presentation.ui.theme.string_generico
+import com.example.yourpoints.presentation.ui.theme.string_generico_name_empty
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +38,9 @@ class GenericoViewModel @Inject constructor(
 
     private val _loading = MutableStateFlow(false)
     val loading:StateFlow<Boolean> = _loading
+
+    private val _showToast = MutableStateFlow("")
+    val showToast:StateFlow<String> = _showToast
 
 
     private val _playerSelected = MutableStateFlow<GenericoPlayerUi?>(null)
@@ -83,6 +88,7 @@ class GenericoViewModel @Inject constructor(
         rounds: Int,
         cantPlayers: Int,
     ) {
+        if (name.isEmpty()){ _showToast.value = string_generico_name_empty ; return }
 
         val players: MutableList<GenericoPlayerUi> = mutableListOf()
         for(i in 0 until cantPlayers){
@@ -265,6 +271,10 @@ class GenericoViewModel @Inject constructor(
 
     fun setDialogChangeName(value: Boolean) {
         _showDialogChangeName.value = value
+    }
+
+    fun clearToast() {
+        _showToast.value = ""
     }
 }
 
