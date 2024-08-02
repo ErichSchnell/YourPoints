@@ -9,10 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,7 +49,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -61,15 +58,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
@@ -84,7 +76,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.yourpoints.R
 import com.example.yourpoints.presentation.model.GenericoPlayerUi
 import com.example.yourpoints.presentation.model.GenericoUi
-import kotlinx.coroutines.launch
+import com.example.yourpoints.presentation.ui.theme.string_generico
+import com.example.yourpoints.presentation.ui.theme.string_generico_setting
+import com.example.yourpoints.presentation.ui.theme.string_setting_points
 
 private const val TAG = "GenericoScreen Intern Test"
 
@@ -151,60 +145,62 @@ fun GenericoScreen(
                     onSelectPlayer = { player -> genericoViewModel.setPlayerSelected(player) },
                 )
             }
-            /*GenericoUiState.SET_POINTS -> {
-                SetPoints(
-                    modifier = Modifier.fillMaxSize(),
-                    game = game,
-                    onValueChange = {
-                        genericoViewModel.updatePoints(it)
-                    },
-                    onAddPlayer = {
-                        genericoViewModel.addPLayer()
-                    }
-                )
-            }
-
-            GenericoUiState.VIEW_POINTS -> {
-                ViewPoints(
-                    modifier = Modifier.fillMaxSize(),
-                    game = game,
-                    onClickChangeViewSetPoints = {
-                        genericoViewModel.changeViewSetPoints()
-                    },
-                    onClickResetGame = {
-                        genericoViewModel.resetGame()
-                    },
-                    onAddPlayer = {
-                        genericoViewModel.addPLayer()
-                    },
-                    onSelectPlayer = { player ->
-                        genericoViewModel.setPlayerSelected(game.player.find { it.playerName == player })
-                    },
-//                    onDeletePlayer = {
-//
-//                    },
-//                    onChangeNamePlayer = {
-//
-//                    },
-                )
-            }*/
         }
         if (loading){
             Loading(Modifier.fillMaxSize())
         }
-        if(playerSelected != null){
-            Log.i(TAG, "playerSelected: $playerSelected")
+        if(playerSelected != null && !showDialogChangeName){
             Dialog(onDismissRequest = { genericoViewModel.setPlayerSelected(null) }) {
-                Column {
-                    TextButton(onClick = {
-                        genericoViewModel.setDialogChangeName(true)
-                    }) {
-                        Text(text = "Change Name")
-                    }
-                    TextButton(onClick = {
-                        genericoViewModel.deletePLayer()
-                    }) {
-                        Text(text = "Delete")
+                Card (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .padding(horizontal = 16.dp)
+                        .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+                ) {
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.background),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = string_generico_setting,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            onClick = {
+                                genericoViewModel.setDialogChangeName(true)
+                            },
+                        ) {
+                            Text(text = "Change Name")
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            onClick = {
+                                genericoViewModel.deletePLayer()
+                            },
+
+                        ) {
+                            Text(text = "Delete Player")
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+
                     }
                 }
             }
@@ -621,7 +617,7 @@ fun Game(
     }
 }
 @Composable
-fun RoundsPlayed(withRounds: Boolean, roundPlayed: Int, roundMax: Int, ){
+fun RoundsPlayed(withRounds: Boolean, roundPlayed: Int, roundMax: Int ){
     if (withRounds){
         val backgroundColor = if (roundPlayed <= roundMax) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.error
         val contentColor = if (roundPlayed <= roundMax) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onError

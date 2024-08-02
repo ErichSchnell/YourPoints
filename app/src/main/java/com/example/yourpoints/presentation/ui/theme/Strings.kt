@@ -22,6 +22,7 @@ const val string_team_winner = "WINNER"
 * ------------------- ANNOTATOR GENERICO -------------------
 * */
 const val string_generico = "Generico"
+const val string_generico_setting = "SETTING"
 /*
 * ------------------------------------
 * */
