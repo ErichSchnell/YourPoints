@@ -9,6 +9,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +27,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -56,13 +61,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,6 +84,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.yourpoints.R
 import com.example.yourpoints.presentation.model.GenericoPlayerUi
 import com.example.yourpoints.presentation.model.GenericoUi
+import kotlinx.coroutines.launch
 
 private const val TAG = "GenericoScreen Intern Test"
 
@@ -670,6 +684,8 @@ fun CardPlayer(
     var point by remember { mutableIntStateOf(0) }
     if (!isSetPoint) point = 0
 
+
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -835,7 +851,26 @@ fun ChangeNumber(
     value:Int = 0,
     onValueChange: (Int) -> Unit
 ){
-    var numberAux by remember { mutableStateOf(value.toString()) }
+    var numberAux by remember { mutableStateOf(TextFieldValue(value.toString())) }
+//    var numberAux by remember { mutableStateOf(value.toString()) }
+    var hasFocus by remember { mutableStateOf(false) }
+
+    val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    LaunchedEffect(isFocused) {
+        numberAux = numberAux.copy(
+            selection = if (isFocused) {
+                Log.i(TAG, "LaunchedEffect: ")
+                TextRange(0, numberAux.text.length)
+            } else {
+                TextRange.Zero
+            }
+        )
+    }
+
+
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
@@ -849,11 +884,15 @@ fun ChangeNumber(
         TextField(
             modifier = Modifier.wrapContentWidth(),
             value = numberAux,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            interactionSource = interactionSource,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions.Default.also {
+                hasFocus = false
+            },
             onValueChange = {
                 numberAux = it
                 try {
-                    onValueChange(it.toInt())
+                    onValueChange(it.text.toInt())
                 } catch (e:Exception){
                     Log.i(TAG, "ChangeNumber error: ${e.message}")
                 }
@@ -862,7 +901,7 @@ fun ChangeNumber(
                 Icon(
                     modifier = Modifier
                         .clickable {
-                            numberAux = value.dec().toString()
+                            numberAux = TextFieldValue(value.dec().toString())
                             onValueChange(value.dec())
                         },
                     tint = MaterialTheme.colorScheme.tertiary, imageVector = Icons.Default.KeyboardArrowDown, contentDescription = ""
@@ -872,7 +911,7 @@ fun ChangeNumber(
                 Icon(
                     modifier = Modifier
                         .clickable {
-                            numberAux = value.inc().toString()
+                            numberAux = TextFieldValue(value.inc().toString())
                             onValueChange(value.inc())
                         },
                     tint = MaterialTheme.colorScheme.tertiary, imageVector = Icons.Default.KeyboardArrowUp, contentDescription = ""
