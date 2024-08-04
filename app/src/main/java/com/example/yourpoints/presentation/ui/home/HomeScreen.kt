@@ -56,6 +56,11 @@ import com.example.yourpoints.R
 import com.example.yourpoints.presentation.model.GenericoUi
 import com.example.yourpoints.presentation.model.TrucoUi
 import com.example.yourpoints.presentation.ui.theme.string_generico
+import com.example.yourpoints.presentation.ui.theme.string_home_delete_games
+import com.example.yourpoints.presentation.ui.theme.string_home_game_generic
+import com.example.yourpoints.presentation.ui.theme.string_home_game_truco
+import com.example.yourpoints.presentation.ui.theme.string_home_select_all_game
+import com.example.yourpoints.presentation.ui.theme.string_home_without_games
 import com.example.yourpoints.presentation.ui.theme.string_truco
 
 private const val TAG = "HomeScreen Intern Test"
@@ -196,7 +201,7 @@ fun OptionBar(
             modifier = Modifier.clickable {
                 onSelectAllGames()
             },
-            text = "Select All",
+            text = string_home_select_all_game,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -204,7 +209,7 @@ fun OptionBar(
             modifier = Modifier.clickable {
                 onDeleteGames()
             },
-            text = "Delete",
+            text = string_home_delete_games,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
         Spacer(modifier = Modifier.width(40.dp))
@@ -433,7 +438,7 @@ fun SinGames(modifier: Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Sin Partidas", color = MaterialTheme.colorScheme.tertiary)
+        Text(text = string_home_without_games, color = MaterialTheme.colorScheme.tertiary)
     }
 }
 
@@ -466,8 +471,8 @@ fun DialogSelectAnnotator(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Annotator(text = "GENERICO")  {onClickAnnotatorGenerico()}
-            Annotator(text = "TRUCO") {onClickAnnotatorTruco()}
+            Annotator(text = string_home_game_generic)  {onClickAnnotatorGenerico()}
+            Annotator(text = string_home_game_truco) {onClickAnnotatorTruco()}
             //Annotator(text = "GENERALA") {onClickAnnotatorGenerala()}
         }
     }

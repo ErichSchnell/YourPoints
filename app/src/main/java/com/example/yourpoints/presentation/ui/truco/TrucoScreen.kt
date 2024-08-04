@@ -1,6 +1,5 @@
 package com.example.yourpoints.presentation.ui.truco
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -59,6 +58,8 @@ import com.example.yourpoints.presentation.model.TrucoUi
 import com.example.yourpoints.presentation.ui.theme.string_cancel
 import com.example.yourpoints.presentation.ui.theme.string_create
 import com.example.yourpoints.presentation.ui.theme.string_create_game
+import com.example.yourpoints.presentation.ui.theme.string_util_new_name
+import com.example.yourpoints.presentation.ui.theme.string_util_update_name
 import com.example.yourpoints.presentation.ui.theme.string_reset
 import com.example.yourpoints.presentation.ui.theme.string_restar_point
 import com.example.yourpoints.presentation.ui.theme.string_setting_points
@@ -488,7 +489,7 @@ fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
-                    label = { Text(text = "New Name", color = MaterialTheme.colorScheme.tertiary) },
+                    label = { Text(text = string_util_new_name, color = MaterialTheme.colorScheme.tertiary) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
@@ -526,7 +527,7 @@ fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit)
                     },
                     enabled = name.isNotEmpty()
                 ) {
-                    Text(text = "Update Name")
+                    Text(text = string_util_update_name)
                 }
             }
         }

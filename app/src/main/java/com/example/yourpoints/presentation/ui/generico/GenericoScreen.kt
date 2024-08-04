@@ -23,10 +23,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -38,6 +40,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -62,9 +65,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -76,9 +81,21 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.yourpoints.R
 import com.example.yourpoints.presentation.model.GenericoPlayerUi
 import com.example.yourpoints.presentation.model.GenericoUi
-import com.example.yourpoints.presentation.ui.theme.string_generico
+import com.example.yourpoints.presentation.ui.theme.string_generico_add_new_palyer
+import com.example.yourpoints.presentation.ui.theme.string_generico_cant_players
+import com.example.yourpoints.presentation.ui.theme.string_generico_change_name
+import com.example.yourpoints.presentation.ui.theme.string_generico_delete_player
+import com.example.yourpoints.presentation.ui.theme.string_generico_is_with_points
+import com.example.yourpoints.presentation.ui.theme.string_generico_name_game
+import com.example.yourpoints.presentation.ui.theme.string_util_new_name
+import com.example.yourpoints.presentation.ui.theme.string_generico_point_finish
+import com.example.yourpoints.presentation.ui.theme.string_generico_point_init
+import com.example.yourpoints.presentation.ui.theme.string_generico_point_to_lose
+import com.example.yourpoints.presentation.ui.theme.string_generico_point_to_win
+import com.example.yourpoints.presentation.ui.theme.string_generico_prefix_rounds
 import com.example.yourpoints.presentation.ui.theme.string_generico_setting
-import com.example.yourpoints.presentation.ui.theme.string_setting_points
+import com.example.yourpoints.presentation.ui.theme.string_generico_title_rounds
+import com.example.yourpoints.presentation.ui.theme.string_util_update_name
 
 private const val TAG = "GenericoScreen Intern Test"
 
@@ -185,8 +202,11 @@ fun CreateGame(
     var roundFlag by remember { mutableStateOf(false) }
     var rounds by remember { mutableIntStateOf(10) }
 
+    val scrollState = rememberScrollState()
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -262,17 +282,32 @@ fun CreateGame(
 fun SetName(modifier: Modifier = Modifier, name:String, onValueChange:(String) -> Unit){
     Column(modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = "Name Game:",
-            style = MaterialTheme.typography.headlineMedium
+            text = string_generico_name_game,
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onSurface
         )
-        TextField(value = name, onValueChange = {onValueChange(it)})
+        TextField (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            value = name,
+            onValueChange = {onValueChange(it)},
+            maxLines = 1,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+            colors = TextFieldDefaults.colors().copy(
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        )
     }
 }
 @Composable
 fun CantPlayers(modifier: Modifier = Modifier, cantPlayers:Int, onValueChange:(Int) -> Unit){
     ChangeNumber(
         modifier,
-        title = "Players Cant",
+        title = string_generico_cant_players,
         value = cantPlayers,
         onValueChange = onValueChange
     )
@@ -291,29 +326,49 @@ fun Points(
     onClickPointFinish:(Int) -> Unit,
 ){
     Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(12.dp)),
         elevation = CardDefaults.cardElevation( defaultElevation = 12.dp)
     ) {
-        Column {
+        Column(modifier.fillMaxWidth()) {
 
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Puntajes")
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = string_generico_is_with_points,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
                 Spacer(modifier = Modifier.weight(1f))
-                Checkbox(checked = pointFlag, onCheckedChange = { onClickPointFlag(it) })
+                Checkbox(
+                    checked = pointFlag,
+                    onCheckedChange = { onClickPointFlag(it) },
+                    colors = CheckboxDefaults.colors().copy(
+                        checkedBorderColor = MaterialTheme.colorScheme.primary,
+                        uncheckedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        checkedCheckmarkColor = MaterialTheme.colorScheme.onPrimary,
+                        uncheckedCheckmarkColor = MaterialTheme.colorScheme.surfaceVariant,
+                        checkedBoxColor = MaterialTheme.colorScheme.primary,
+                        uncheckedBoxColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                )
             }
 
             AnimatedVisibility(visible = pointFlag) {
                 Column{
                     ChangeNumber(
                         modifier = Modifier.fillMaxWidth(),
-                        title = "Point Init",
+                        title = string_generico_point_init,
+                        titleStyle = MaterialTheme.typography.titleLarge,
+                        titleColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         value = pointInit,
                         onValueChange = onClickPointInit
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
                     ChangeNumber(
                         modifier = Modifier.fillMaxWidth(),
-                        title = "Point Finish",
+                        title = string_generico_point_finish,
+                        titleStyle = MaterialTheme.typography.titleLarge,
+                        titleColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         value = pointFinish,
                         onValueChange = onClickPointFinish
                     )
@@ -323,7 +378,6 @@ fun Points(
                         onClickFinishToWin = onClickFinishToWin,
                     )
                 }
-
             }
         }
     }
@@ -334,11 +388,19 @@ fun FinishToWin(modifier: Modifier, finishToWin: Boolean, onClickFinishToWin: (B
     Column(modifier = modifier, verticalArrangement = Arrangement.Center) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             RadioButton(selected = finishToWin, onClick = { onClickFinishToWin(true)})
-            Text(text = "Quien alcanza el puntaje, GANA")
+            Text(
+                text = string_generico_point_to_win,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             RadioButton(selected = !finishToWin, onClick = { onClickFinishToWin(false)})
-            Text(text = "Quien alcanza el puntaje, PIERDE")
+            Text(
+                text = string_generico_point_to_lose,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
     }
@@ -353,25 +415,45 @@ fun Rounds(
     onClickRounds:(Int) -> Unit,
 ){
     Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.background(color = MaterialTheme.colorScheme.onSurfaceVariant, shape = RoundedCornerShape(12.dp)),
         elevation = CardDefaults.cardElevation( defaultElevation = 12.dp)
     ) {
-        Column {
+        Column(modifier.fillMaxWidth()) {
 
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Rounds")
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = string_generico_title_rounds,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
                 Spacer(modifier = Modifier.weight(1f))
-                Checkbox(checked = roundFlag, onCheckedChange = { onClickRoundFlag(it) })
+                Checkbox(
+                    checked = roundFlag,
+                    onCheckedChange = { onClickRoundFlag(it) },
+                    colors = CheckboxDefaults.colors().copy(
+                        checkedBorderColor = MaterialTheme.colorScheme.primary,
+                        uncheckedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        checkedCheckmarkColor = MaterialTheme.colorScheme.onPrimary,
+                        uncheckedCheckmarkColor = MaterialTheme.colorScheme.surfaceVariant,
+                        checkedBoxColor = MaterialTheme.colorScheme.primary,
+                        uncheckedBoxColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                )
             }
 
             AnimatedVisibility(visible = roundFlag) {
-                ChangeNumber(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = rounds,
-                    onValueChange = onClickRounds
-                )
+                Column {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    ChangeNumber(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = rounds,
+                        onValueChange = onClickRounds
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                }
             }
+
         }
     }
 }
@@ -386,12 +468,13 @@ fun SelectName(
     onValueChange: (List<String>) -> Unit
 ) {
     val playerNames by remember { mutableStateOf(mutableListOf<String>()) }
+    val scrollState = rememberScrollState()
 
     for (i in 0 until cantPlayers){
         playerNames.add("Player ${i+1}")
     }
 
-    Column(modifier = modifier) {
+    Column(modifier = modifier.verticalScroll(scrollState)) {
         for (i in 0 until cantPlayers){
             PrototypePlayer(
                 modifier = Modifier.fillMaxWidth(),
@@ -482,6 +565,7 @@ fun Game(
     onClickResetGame:() -> Unit,
     onSelectPlayer:(GenericoPlayerUi) -> Unit,
 ){
+    val scrollState = rememberScrollState()
     val newPoints by remember { mutableStateOf( mutableListOf<Int>() ) }
 
     if (newPoints.size != game.player.size){
@@ -493,7 +577,9 @@ fun Game(
 
     Log.i(TAG, "Game: newPoints: $newPoints")
     
-    Column(modifier = Modifier.fillMaxSize()){
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(scrollState)){
         RoundsPlayed(game.withRounds, game.roundPlayed, game.roundMax)
 
         ListPlayer(
@@ -573,7 +659,7 @@ fun RoundsPlayed(withRounds: Boolean, roundPlayed: Int, roundMax: Int ){
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Round: $roundPlayed de $roundMax",
+                text = "$string_generico_prefix_rounds $roundPlayed de $roundMax",
                 style = MaterialTheme.typography.titleLarge,
                 color = contentColor
             )
@@ -779,7 +865,7 @@ fun AddPlayer(onAddPlayer:() -> Unit){
         verticalAlignment = Alignment.CenterVertically) {
         Text(
             modifier = Modifier.clickable { onAddPlayer() },
-            text = "Add New Player..."
+            text = string_generico_add_new_palyer
         )
     }
 }
@@ -787,6 +873,8 @@ fun AddPlayer(onAddPlayer:() -> Unit){
 fun ChangeNumber(
     modifier: Modifier = Modifier,
     title:String? = null,
+    titleStyle:TextStyle = MaterialTheme.typography.headlineSmall,
+    titleColor:Color = MaterialTheme.colorScheme.onSurface,
     value:Int = 0,
     onValueChange: (Int) -> Unit
 ){
@@ -816,7 +904,12 @@ fun ChangeNumber(
     ) {
 
         title?.let {
-            Text(modifier = Modifier.fillMaxWidth(), text = it, textAlign = TextAlign.Center)
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = it,
+                textAlign = TextAlign.Center,
+                color = titleColor, style = titleStyle
+            )
         }
 
         TextField(
@@ -904,7 +997,7 @@ fun DialogSettingPlayer(
                         onSetDialogChangeName()
                     },
                 ) {
-                    Text(text = "Change Name")
+                    Text(text = string_generico_change_name)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -918,7 +1011,7 @@ fun DialogSettingPlayer(
                     },
 
                     ) {
-                    Text(text = "Delete Player")
+                    Text(text = string_generico_delete_player)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -947,7 +1040,7 @@ fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
-                    label = { Text(text = "New Name", color = MaterialTheme.colorScheme.tertiary) },
+                    label = { Text(text = string_util_new_name, color = MaterialTheme.colorScheme.tertiary) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
@@ -985,7 +1078,7 @@ fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit)
                     },
                     enabled = name.isNotEmpty()
                 ) {
-                    Text(text = "Update Name")
+                    Text(text = string_util_update_name)
                 }
             }
         }
