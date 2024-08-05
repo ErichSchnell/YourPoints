@@ -9,8 +9,8 @@ data class TrucoUi(
     val selected:Boolean = false,
     val dataCreated: String = "",
     val pointLimit:Int = 0,
-    val player1: TrucoPlayerUi = TrucoPlayerUi("Nosotros"),
-    val player2: TrucoPlayerUi = TrucoPlayerUi("Ellos"),
+    val player1: TrucoPlayerUi = TrucoPlayerUi("Team1"),
+    val player2: TrucoPlayerUi = TrucoPlayerUi("Team2"),
     val winner: TypePlayer = TypePlayer.VACIO
 ) {
     fun changeSelect() = this.copy(

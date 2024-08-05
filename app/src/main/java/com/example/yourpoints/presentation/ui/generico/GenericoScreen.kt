@@ -51,8 +51,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -93,6 +95,7 @@ import com.example.yourpoints.presentation.ui.theme.string_generico_point_init
 import com.example.yourpoints.presentation.ui.theme.string_generico_point_to_lose
 import com.example.yourpoints.presentation.ui.theme.string_generico_point_to_win
 import com.example.yourpoints.presentation.ui.theme.string_generico_prefix_rounds
+import com.example.yourpoints.presentation.ui.theme.string_generico_select_name
 import com.example.yourpoints.presentation.ui.theme.string_generico_setting
 import com.example.yourpoints.presentation.ui.theme.string_generico_title_rounds
 import com.example.yourpoints.presentation.ui.theme.string_util_update_name
@@ -182,7 +185,7 @@ fun Loading(modifier: Modifier) {
     ) {
         CircularProgressIndicator(
             modifier = Modifier.size(38.dp),
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.tertiary,
             strokeWidth = 2.dp
         )
     }
@@ -203,10 +206,22 @@ fun CreateGame(
     var rounds by remember { mutableIntStateOf(10) }
 
     val scrollState = rememberScrollState()
+
+    val textFieldColors = TextFieldDefaults.colors().copy(
+        focusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        focusedTextColor = MaterialTheme.colorScheme.onTertiaryContainer,
+        unfocusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+        unfocusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+        cursorColor = MaterialTheme.colorScheme.primary,
+        focusedLeadingIconColor = MaterialTheme.colorScheme.onTertiaryContainer,
+        unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        focusedTrailingIconColor = MaterialTheme.colorScheme.onTertiaryContainer,
+        unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
+    )
+
     Column(
-        modifier = modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .verticalScroll(scrollState),
+        modifier = modifier.verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -215,6 +230,9 @@ fun CreateGame(
                 .fillMaxWidth()
                 .padding(16.dp),
             name = name,
+            textFieldColors = textFieldColors.copy(
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer
+            ),
             onValueChange = { name = it }
         )
         CantPlayers(
@@ -222,13 +240,19 @@ fun CreateGame(
                 .fillMaxWidth()
                 .padding(16.dp),
             cantPlayers = cantPlayers,
+            textFieldColors = textFieldColors.copy(
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer
+            ),
             onValueChange = { cantPlayers = it }
         )
 
         Points(
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
+            textFieldColors = textFieldColors.copy(
+                unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            ),
 
             pointFlag = pointFlag,
             onClickPointFlag = { pointFlag = it },
@@ -244,9 +268,13 @@ fun CreateGame(
         )
 
         Rounds(
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
+            textFieldColors = textFieldColors.copy(
+                unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            ),
+
             roundFlag = roundFlag,
             onClickRoundFlag = { roundFlag = it },
             rounds = rounds,
@@ -257,6 +285,8 @@ fun CreateGame(
             modifier = Modifier
                 .align(Alignment.End)
                 .padding(24.dp),
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary,
             onClick = {
                 onClickCreateGame(
                     name,
@@ -279,12 +309,12 @@ fun CreateGame(
     }
 }
 @Composable
-fun SetName(modifier: Modifier = Modifier, name:String, onValueChange:(String) -> Unit){
+fun SetName(modifier: Modifier = Modifier, name:String, textFieldColors: TextFieldColors = TextFieldDefaults.colors(), onValueChange:(String) -> Unit){
     Column(modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = string_generico_name_game,
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.primary
         )
         TextField (
             modifier = Modifier
@@ -295,20 +325,18 @@ fun SetName(modifier: Modifier = Modifier, name:String, onValueChange:(String) -
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            colors = TextFieldDefaults.colors().copy(
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            colors = textFieldColors
         )
     }
 }
 @Composable
-fun CantPlayers(modifier: Modifier = Modifier, cantPlayers:Int, onValueChange:(Int) -> Unit){
+fun CantPlayers(modifier: Modifier = Modifier, cantPlayers:Int, textFieldColors: TextFieldColors = TextFieldDefaults.colors(), onValueChange:(Int) -> Unit){
     ChangeNumber(
         modifier,
         title = string_generico_cant_players,
+        titleColor = MaterialTheme.colorScheme.primary,
         value = cantPlayers,
+        textFieldColors = textFieldColors,
         onValueChange = onValueChange
     )
 }
@@ -316,6 +344,7 @@ fun CantPlayers(modifier: Modifier = Modifier, cantPlayers:Int, onValueChange:(I
 @Composable
 fun Points(
     modifier: Modifier = Modifier,
+    textFieldColors: TextFieldColors = TextFieldDefaults.colors(),
     pointFlag:Boolean,
     onClickPointFlag:(Boolean) -> Unit,
     pointInit:Int,
@@ -325,31 +354,42 @@ fun Points(
     pointFinish:Int,
     onClickPointFinish:(Int) -> Unit,
 ){
-    Card(
-        modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(12.dp)),
-        elevation = CardDefaults.cardElevation( defaultElevation = 12.dp)
-    ) {
-        Column(modifier.fillMaxWidth()) {
+    val pointContainerColor = if (pointFlag) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+    val pointContentColor = if (pointFlag) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+    val checkBoxColor = CheckboxDefaults.colors().copy(
+        checkedBorderColor = MaterialTheme.colorScheme.primary,
+        uncheckedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        checkedCheckmarkColor = MaterialTheme.colorScheme.onPrimary,
+        uncheckedCheckmarkColor = MaterialTheme.colorScheme.surfaceVariant,
+        checkedBoxColor = MaterialTheme.colorScheme.primary,
+        uncheckedBoxColor = MaterialTheme.colorScheme.surfaceVariant,
+    )
 
+
+
+
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation( defaultElevation = 12.dp),
+        colors = CardDefaults.cardColors().copy(
+            containerColor = pointContainerColor,
+            contentColor = pointContentColor,
+        )
+    ) {
+
+        Column(modifier.fillMaxWidth()) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = string_generico_is_with_points,
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = pointContentColor
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Checkbox(
                     checked = pointFlag,
                     onCheckedChange = { onClickPointFlag(it) },
-                    colors = CheckboxDefaults.colors().copy(
-                        checkedBorderColor = MaterialTheme.colorScheme.primary,
-                        uncheckedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        checkedCheckmarkColor = MaterialTheme.colorScheme.onPrimary,
-                        uncheckedCheckmarkColor = MaterialTheme.colorScheme.surfaceVariant,
-                        checkedBoxColor = MaterialTheme.colorScheme.primary,
-                        uncheckedBoxColor = MaterialTheme.colorScheme.surfaceVariant,
-                    )
+                    colors = checkBoxColor
                 )
             }
 
@@ -359,18 +399,20 @@ fun Points(
                         modifier = Modifier.fillMaxWidth(),
                         title = string_generico_point_init,
                         titleStyle = MaterialTheme.typography.titleLarge,
-                        titleColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        titleColor = MaterialTheme.colorScheme.secondary,
                         value = pointInit,
-                        onValueChange = onClickPointInit
+                        onValueChange = onClickPointInit,
+                        textFieldColors = textFieldColors
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
                     ChangeNumber(
                         modifier = Modifier.fillMaxWidth(),
                         title = string_generico_point_finish,
                         titleStyle = MaterialTheme.typography.titleLarge,
-                        titleColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        titleColor = MaterialTheme.colorScheme.secondary,
                         value = pointFinish,
-                        onValueChange = onClickPointFinish
+                        onValueChange = onClickPointFinish,
+                        textFieldColors = textFieldColors
                     )
                     FinishToWin(
                         modifier = Modifier.fillMaxWidth(),
@@ -387,19 +429,29 @@ fun Points(
 fun FinishToWin(modifier: Modifier, finishToWin: Boolean, onClickFinishToWin: (Boolean) -> Unit) {
     Column(modifier = modifier, verticalArrangement = Arrangement.Center) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            RadioButton(selected = finishToWin, onClick = { onClickFinishToWin(true)})
+            RadioButton(
+                selected = finishToWin, onClick = { onClickFinishToWin(true)},
+                colors = RadioButtonDefaults.colors().copy(
+                    selectedColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            )
             Text(
                 text = string_generico_point_to_win,
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.secondary
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            RadioButton(selected = !finishToWin, onClick = { onClickFinishToWin(false)})
+            RadioButton(selected = !finishToWin, onClick = { onClickFinishToWin(false)},
+                colors = RadioButtonDefaults.colors().copy(
+                    selectedColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ))
             Text(
                 text = string_generico_point_to_lose,
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.secondary
             )
         }
 
@@ -409,14 +461,30 @@ fun FinishToWin(modifier: Modifier, finishToWin: Boolean, onClickFinishToWin: (B
 @Composable
 fun Rounds(
     modifier: Modifier = Modifier,
+    textFieldColors: TextFieldColors = TextFieldDefaults.colors(),
     roundFlag:Boolean = false,
     onClickRoundFlag:(Boolean) -> Unit,
     rounds:Int = 0,
     onClickRounds:(Int) -> Unit,
 ){
+    val pointContainerColor = if (roundFlag) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+    val pointContentColor = if (roundFlag) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+    val checkBoxColor = CheckboxDefaults.colors().copy(
+        checkedBorderColor = MaterialTheme.colorScheme.primary,
+        uncheckedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        checkedCheckmarkColor = MaterialTheme.colorScheme.onPrimary,
+        uncheckedCheckmarkColor = MaterialTheme.colorScheme.surfaceVariant,
+        checkedBoxColor = MaterialTheme.colorScheme.primary,
+        uncheckedBoxColor = MaterialTheme.colorScheme.surfaceVariant,
+    )
+
     Card(
-        modifier = modifier.background(color = MaterialTheme.colorScheme.onSurfaceVariant, shape = RoundedCornerShape(12.dp)),
-        elevation = CardDefaults.cardElevation( defaultElevation = 12.dp)
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation( defaultElevation = 12.dp),
+        colors = CardDefaults.cardColors().copy(
+            containerColor = pointContainerColor,
+            contentColor = pointContentColor,
+        )
     ) {
         Column(modifier.fillMaxWidth()) {
 
@@ -425,20 +493,13 @@ fun Rounds(
                 Text(
                     text = string_generico_title_rounds,
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = pointContentColor
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Checkbox(
                     checked = roundFlag,
                     onCheckedChange = { onClickRoundFlag(it) },
-                    colors = CheckboxDefaults.colors().copy(
-                        checkedBorderColor = MaterialTheme.colorScheme.primary,
-                        uncheckedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        checkedCheckmarkColor = MaterialTheme.colorScheme.onPrimary,
-                        uncheckedCheckmarkColor = MaterialTheme.colorScheme.surfaceVariant,
-                        checkedBoxColor = MaterialTheme.colorScheme.primary,
-                        uncheckedBoxColor = MaterialTheme.colorScheme.surfaceVariant,
-                    )
+                    colors = checkBoxColor
                 )
             }
 
@@ -447,6 +508,7 @@ fun Rounds(
                     Spacer(modifier = Modifier.width(8.dp))
                     ChangeNumber(
                         modifier = Modifier.fillMaxWidth(),
+                        textFieldColors = textFieldColors,
                         value = rounds,
                         onValueChange = onClickRounds
                     )
@@ -475,6 +537,15 @@ fun SelectName(
     }
 
     Column(modifier = modifier.verticalScroll(scrollState)) {
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = string_generico_select_name,
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.primary,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         for (i in 0 until cantPlayers){
             PrototypePlayer(
                 modifier = Modifier.fillMaxWidth(),
@@ -482,13 +553,15 @@ fun SelectName(
                 onValueChange = { 
                     playerNames[i] = it
                 }
-
             )
         }
         Spacer(modifier = Modifier.weight(1f))
         FloatingActionButton(modifier = Modifier
             .padding(24.dp)
-            .align(Alignment.End), onClick = { onValueChange(playerNames) }) {
+            .align(Alignment.End), onClick = { onValueChange(playerNames) },
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary,
+            ) {
             Icon(
                 imageVector = Icons.Default.PlayArrow,
                 contentDescription = null,
@@ -505,6 +578,18 @@ fun PrototypePlayer(
     onValueChange:(String) -> Unit,
 ){
     var name by remember { mutableStateOf("") }
+
+    val textFieldColors = OutlinedTextFieldDefaults.colors().copy(
+        focusedTextColor = MaterialTheme.colorScheme.tertiary,
+        unfocusedTextColor = MaterialTheme.colorScheme.primary,
+        focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+        unfocusedIndicatorColor = MaterialTheme.colorScheme.primary,
+        cursorColor = MaterialTheme.colorScheme.primary,
+        focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+        unfocusedLabelColor = MaterialTheme.colorScheme.primary
+    )
+
+
 
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
 
@@ -526,7 +611,7 @@ fun PrototypePlayer(
         }
 
         OutlinedTextField(
-            label = { Text(text = playerName, color = MaterialTheme.colorScheme.tertiary) },
+            label = { Text(text = playerName) },
             modifier = Modifier.fillMaxWidth(),
             value = name,
             onValueChange = {
@@ -544,12 +629,7 @@ fun PrototypePlayer(
                     modifier = Modifier.size(18.dp)
                 )
             },
-            colors = OutlinedTextFieldDefaults.colors(
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedTextColor = MaterialTheme.colorScheme.primary,
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.tertiary
-            )
+            colors = textFieldColors
         )
 
     }
@@ -875,6 +955,7 @@ fun ChangeNumber(
     title:String? = null,
     titleStyle:TextStyle = MaterialTheme.typography.headlineSmall,
     titleColor:Color = MaterialTheme.colorScheme.onSurface,
+    textFieldColors: TextFieldColors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.background, focusedContainerColor = MaterialTheme.colorScheme.background,),
     value:Int = 0,
     onValueChange: (Int) -> Unit
 ){
@@ -935,7 +1016,7 @@ fun ChangeNumber(
                             numberAux = TextFieldValue(value.dec().toString())
                             onValueChange(value.dec())
                         },
-                    tint = MaterialTheme.colorScheme.tertiary, imageVector = Icons.Default.KeyboardArrowDown, contentDescription = ""
+                    imageVector = Icons.Default.KeyboardArrowDown, contentDescription = ""
                 )
             },
             trailingIcon = {
@@ -945,15 +1026,12 @@ fun ChangeNumber(
                             numberAux = TextFieldValue(value.inc().toString())
                             onValueChange(value.inc())
                         },
-                    tint = MaterialTheme.colorScheme.tertiary, imageVector = Icons.Default.KeyboardArrowUp, contentDescription = ""
+                    imageVector = Icons.Default.KeyboardArrowUp, contentDescription = ""
                 )
             },
             textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
             singleLine =  true,
-            colors =  TextFieldDefaults.colors(
-                unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                focusedContainerColor = MaterialTheme.colorScheme.background,
-            ),
+            colors =  textFieldColors ,
         )
     }
 }

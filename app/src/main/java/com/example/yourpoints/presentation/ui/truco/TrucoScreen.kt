@@ -212,8 +212,8 @@ fun TrucoAnnotator(
 @Composable
 fun Cabecera(
     modifier: Modifier = Modifier,
-    player1Name: String = "Nosotros",
-    player2Name: String = "Ellos",
+    player1Name: String = "Team1",
+    player2Name: String = "Team2",
     onClickSetting: () -> Unit,
     onClickPlayer1: () -> Unit,
     onClickPlayer2: () -> Unit,
