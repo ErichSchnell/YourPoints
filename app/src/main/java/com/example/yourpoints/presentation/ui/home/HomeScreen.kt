@@ -83,7 +83,7 @@ fun HomeScreen (
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
-    ){
+    ) {
 
         when(uiState){
             HomeViewState.LOADING -> Loading(Modifier.align(Alignment.Center))
@@ -124,6 +124,8 @@ fun HomeScreen (
                 SinGames(Modifier.align(Alignment.Center))
                 StartAnnotator(Modifier.align(Alignment.BottomEnd)){showDialog = true}
             }
+
+            else -> {}
         }
 
         if (showDialog) {
@@ -192,7 +194,7 @@ fun OptionBar(
 ){
     Row (
         modifier = modifier
-            .background(MaterialTheme.colorScheme.primaryContainer),
+            .background(MaterialTheme.colorScheme.tertiaryContainer),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ){
@@ -202,7 +204,7 @@ fun OptionBar(
                 onSelectAllGames()
             },
             text = string_home_select_all_game,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
+            color = MaterialTheme.colorScheme.onTertiaryContainer
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
@@ -210,7 +212,7 @@ fun OptionBar(
                 onDeleteGames()
             },
             text = string_home_delete_games,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
+            color = MaterialTheme.colorScheme.onTertiaryContainer
         )
         Spacer(modifier = Modifier.width(40.dp))
     }
@@ -248,7 +250,10 @@ fun Games(modifier:Modifier = Modifier, games: List<Any>, onTap: (Int) -> Unit, 
 }
 @Composable
 fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int) -> Unit){
-    val borderColor = if(game.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceDim
+    val borderColor = if(game.selected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primaryContainer
+    val conteinerColor = if(game.selected) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer
+    val dateColor = if(game.selected) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onPrimaryContainer
+    val dateGameColor = if(game.selected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
 
     Card(
         modifier = Modifier
@@ -267,7 +272,7 @@ fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int)
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(conteinerColor),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -276,7 +281,7 @@ fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int)
                     .padding(8.dp),
                 text = string_truco,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.tertiary,
+                color = dateColor,
             )
 
             Row( modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
@@ -286,12 +291,12 @@ fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int)
                         Text(
                             text = game.player1.playerName,
                             style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.secondary,
+                            color = dateGameColor,
                         )
                         Text(
                             text = game.player1.playerPoint.toString(),
                             style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = dateColor,
                         )
                     }
                 }
@@ -299,7 +304,7 @@ fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int)
                 Text(
                     text = game.pointLimit.toString(),
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.tertiary,
+                    color = dateGameColor,
                 )
 
                 Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
@@ -307,12 +312,12 @@ fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int)
                         Text(
                             text = game.player2.playerName,
                             style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.secondary,
+                            color = dateGameColor,
                         )
                         Text(
                             text = game.player2.playerPoint.toString(),
                             style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = dateColor,
                         )
                     }
                 }
@@ -326,15 +331,18 @@ fun ItemTruco(index:Int, game: TrucoUi, onTap: (Int) -> Unit, onLongPress: (Int)
                     .align(Alignment.BottomCenter)
                     .padding(8.dp),
                 text = game.dataCreated,
-                color = MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.bodyMedium,
+                color = dateColor,
             )
         }
     }
 }
 @Composable
 fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress: (Int) -> Unit){
-    val border = if(game.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceDim
+    val borderColor = if(game.selected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primaryContainer
+    val conteinerColor = if(game.selected) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer
+    val dateColor = if(game.selected) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onPrimaryContainer
+    val dateGameColor = if(game.selected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
 
     Card(
         modifier = Modifier
@@ -347,13 +355,13 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
             .clip(RoundedCornerShape(12.dp))
             .padding(horizontal = 16.dp)
             .padding(vertical = 8.dp)
-            .border(2.dp, border, RoundedCornerShape(12.dp))
+            .border(2.dp, borderColor, RoundedCornerShape(12.dp))
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(conteinerColor),
             contentAlignment = Alignment.Center
         ) {
 
@@ -363,7 +371,7 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
                     .padding(8.dp),
                 text = string_generico,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.tertiary,
+                color = dateColor,
             )
 
             Row( modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
@@ -372,44 +380,44 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
                     Text(
                         text = game.name,
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.secondary,
+                        color = dateGameColor,
                     )
                 }
                 Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
 
                     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(imageVector = Icons.Default.Face, contentDescription = "")
+                        Icon(imageVector = Icons.Default.Face, contentDescription = "", tint = dateGameColor)
                         Text(
                             text = game.player.size.toString(),
                             style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = dateColor,
                         )
                     }
                     VerticalDivider(
                         Modifier
                             .height(24.dp)
-                            .padding(horizontal = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            .padding(horizontal = 8.dp), color = dateGameColor)
 
                     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(painter = painterResource(id = R.drawable.ic_scoreboard), contentDescription = "")
+                        Icon(painter = painterResource(id = R.drawable.ic_scoreboard), contentDescription = "", tint = dateGameColor)
                         Text(
                             text = if(game.withPoints) "${game.pointToInit}-${game.pointToFinish}" else "-",
                             style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = dateColor,
                         )
                     }
                     VerticalDivider(
                         Modifier
                             .height(24.dp)
-                            .padding(horizontal = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            .padding(horizontal = 8.dp), color = dateGameColor)
 
                     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 //                        Icon(imageVector = Icons.Default.Refresh, contentDescription = "")
-                        Icon(painter = painterResource(id = R.drawable.ic_rounds), contentDescription = "")
+                        Icon(painter = painterResource(id = R.drawable.ic_rounds), contentDescription = "", tint = dateGameColor)
                         Text(
                             text = if (game.withRounds) "${game.roundPlayed}/${game.roundMax}" else "-",
                             style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = dateColor,
                         )
                     }
 
@@ -425,7 +433,7 @@ fun ItemGenerico(index:Int, game: GenericoUi, onTap: (Int) -> Unit, onLongPress:
                     .padding(8.dp),
                 text = game.dataCreated,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.tertiary,
+                color = dateColor,
             )
         }
     }
@@ -447,11 +455,16 @@ fun SinGames(modifier: Modifier) {
 
 @Composable
 fun StartAnnotator(modifier: Modifier = Modifier, onClick: () -> Unit) {
-    FloatingActionButton(modifier = modifier.padding(24.dp), onClick = { onClick() }) {
+    FloatingActionButton(
+        modifier = modifier.padding(24.dp),
+        containerColor = MaterialTheme.colorScheme.secondary,
+        contentColor = MaterialTheme.colorScheme.onSecondary,
+        onClick = { onClick() }
+    ) {
         Icon(
             imageVector = Icons.Default.Add,
             contentDescription = null,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(18.dp),
         )
     }
 

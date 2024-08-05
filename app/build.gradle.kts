@@ -67,6 +67,7 @@ dependencies {
 
     //Room
     implementation("androidx.room:room-runtime:2.5.0")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.8")
     ksp("androidx.room:room-compiler:2.5.0")
     implementation("androidx.room:room-ktx:2.5.0")
 

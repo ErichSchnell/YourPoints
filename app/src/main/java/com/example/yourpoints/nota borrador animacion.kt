@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.sp
 import com.example.yourpoints.presentation.ui.generico.ChangeNumber
 import com.example.yourpoints.presentation.ui.generico.ScoreCircleBox
 
+
+
 /*
 
             .combinedClickable(
