@@ -32,8 +32,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -86,6 +88,7 @@ import com.example.yourpoints.presentation.model.GenericoUi
 import com.example.yourpoints.presentation.ui.theme.string_generico_add_new_palyer
 import com.example.yourpoints.presentation.ui.theme.string_generico_cant_players
 import com.example.yourpoints.presentation.ui.theme.string_generico_change_name
+import com.example.yourpoints.presentation.ui.theme.string_generico_date_created
 import com.example.yourpoints.presentation.ui.theme.string_generico_delete_player
 import com.example.yourpoints.presentation.ui.theme.string_generico_is_with_points
 import com.example.yourpoints.presentation.ui.theme.string_generico_name_game
@@ -114,6 +117,8 @@ fun GenericoScreen(
     val showToast by genericoViewModel.showToast.collectAsState()
     val showDialogChangeName by genericoViewModel.showDialogChangeName.collectAsState()
     val playerSelected by genericoViewModel.playerSelected.collectAsState()
+    
+    var showDialogMenu by remember { mutableStateOf(false) }
 
 
     LaunchedEffect(true){
@@ -151,6 +156,7 @@ fun GenericoScreen(
                     onClickChangeViewSetPoints = { genericoViewModel.changeViewSetPoints() },
                     onClickResetGame = { genericoViewModel.resetGame() },
                     onSelectPlayer = { player -> genericoViewModel.setPlayerSelected(player) },
+                    onClickMenu = { showDialogMenu = true}
                 )
             }
         }
@@ -169,6 +175,12 @@ fun GenericoScreen(
                 genericoViewModel.changeName(it)
             }
         }
+        DialogMenu(
+            showDialogMenu,
+            game.name,
+            game.dataCreated,
+            onDismissRequest = { showDialogMenu = false}
+        )
     }
 
     ShowToast(text = showToast){
@@ -644,9 +656,11 @@ fun Game(
     onClickChangeViewSetPoints:() -> Unit,
     onClickResetGame:() -> Unit,
     onSelectPlayer:(GenericoPlayerUi) -> Unit,
+    onClickMenu:() -> Unit
 ){
     val scrollState = rememberScrollState()
     val newPoints by remember { mutableStateOf( mutableListOf<Int>() ) }
+    val backgroundColor = if (game.roundPlayed <= game.roundMax) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
 
     if (newPoints.size != game.player.size){
         newPoints.clear()
@@ -658,8 +672,14 @@ fun Game(
     Log.i(TAG, "Game: newPoints: $newPoints")
 
     Column {
-        Box {
+        Box(
+            Modifier.fillMaxWidth().height(50.dp).background(backgroundColor),
+            contentAlignment = Alignment.Center
+            ){
             RoundsPlayed(game.withRounds, game.roundPlayed, game.roundMax)
+            IconMenu(Modifier.align(Alignment.CenterEnd).padding(end = 16.dp)){
+                onClickMenu()
+            }
         }
 
         Column(modifier = Modifier
@@ -739,25 +759,30 @@ fun Game(
     }
 }
 @Composable
+fun IconMenu(modifier: Modifier, onClick:() -> Unit){
+    Icon(
+        modifier = modifier.clickable {onClick() },
+        imageVector = Icons.Default.Menu, 
+        contentDescription = null 
+    )
+}
+@Composable
 fun RoundsPlayed(withRounds: Boolean, roundPlayed: Int, roundMax: Int ){
-    if (withRounds){
-        val backgroundColor = if (roundPlayed <= roundMax) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
-        val contentColor = if (roundPlayed <= roundMax) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onError
+    if (!withRounds) return
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(backgroundColor),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "$string_generico_prefix_rounds $roundPlayed de $roundMax",
-                style = MaterialTheme.typography.titleLarge,
-                color = contentColor
-            )
-        }
+    val contentColor = if (roundPlayed <= roundMax) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onError
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "$string_generico_prefix_rounds $roundPlayed de $roundMax",
+            style = MaterialTheme.typography.titleLarge,
+            color = contentColor
+        )
     }
+
 }
 @Composable
 fun ListPlayer(
@@ -1175,6 +1200,30 @@ fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit)
             }
         }
 
+    }
+}
+
+@Composable
+fun DialogMenu(
+    showDialog: Boolean,
+    gameName:String,
+    dataCreated:String,
+    onDismissRequest:() -> Unit
+){
+    if (!showDialog) return
+
+    Dialog(onDismissRequest = { onDismissRequest() }){
+        Column(
+            Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Text(text = string_generico_name_game)
+            Text(text = gameName)
+            Text(text = string_generico_date_created)
+            Text(text = dataCreated)
+
+        }
     }
 }
 @Composable
