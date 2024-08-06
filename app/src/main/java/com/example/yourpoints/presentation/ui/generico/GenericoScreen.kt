@@ -656,70 +656,83 @@ fun Game(
     }
 
     Log.i(TAG, "Game: newPoints: $newPoints")
-    
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(scrollState)){
-        RoundsPlayed(game.withRounds, game.roundPlayed, game.roundMax)
 
-        ListPlayer(
-            isSetPoint = game.isSetPoint,
-            players = game.player,
-            finishToWin = game.finishToWin,
-            withPoints = game.withPoints,
-            pointToInit = game.pointToInit,
-            pointToFinish = game.pointToFinish,
+    Column {
+        Box {
+            RoundsPlayed(game.withRounds, game.roundPlayed, game.roundMax)
+        }
 
-            onPointChange = { player, newPoint ->
-                newPoints[game.player.indexOf(player)] = newPoint
-                Log.i(TAG, "Game: newPoints: $newPoints")
-            },
-            onSelectPlayer = onSelectPlayer
-        )
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)){
 
-        AddPlayer(onAddPlayer)
+            ListPlayer(
+                isSetPoint = game.isSetPoint,
+                players = game.player,
+                finishToWin = game.finishToWin,
+                withPoints = game.withPoints,
+                pointToInit = game.pointToInit,
+                pointToFinish = game.pointToFinish,
 
-        Spacer(modifier = Modifier.weight(1f))
+                onPointChange = { player, newPoint ->
+                    newPoints[game.player.indexOf(player)] = newPoint
+                    Log.i(TAG, "Game: newPoints: $newPoints")
+                },
+                onSelectPlayer = onSelectPlayer
+            )
+
+            AddPlayer(onAddPlayer)
+
+            Spacer(modifier = Modifier.weight(1f))
 
 
-        if (game.isSetPoint){
-            FloatingActionButton(modifier = Modifier
-                .padding(24.dp)
-                .align(Alignment.End), onClick = {
-                onValueChange(newPoints)
-            }) {
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-        } else {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp) ) {
-                if (game.finished || game.roundPlayed > game.roundMax){
-                    FloatingActionButton(
-                        onClick = { onClickResetGame() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                FloatingActionButton(
-                    onClick = { onClickChangeViewSetPoints() }) {
+            if (game.isSetPoint){
+                FloatingActionButton(modifier = Modifier
+                    .padding(24.dp)
+                    .align(Alignment.End),
+                    onClick = {
+                        onValueChange(newPoints)
+                    },
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                ) {
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
                         contentDescription = null,
                         modifier = Modifier.size(18.dp)
                     )
+                }
+            } else {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp) ) {
+                    if (game.finished || game.roundPlayed > game.roundMax){
+                        FloatingActionButton(
+                            onClick = { onClickResetGame() },
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.onSecondary,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    FloatingActionButton(
+                        onClick = { onClickChangeViewSetPoints() },
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary,) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
             }
         }
@@ -728,8 +741,8 @@ fun Game(
 @Composable
 fun RoundsPlayed(withRounds: Boolean, roundPlayed: Int, roundMax: Int ){
     if (withRounds){
-        val backgroundColor = if (roundPlayed <= roundMax) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.error
-        val contentColor = if (roundPlayed <= roundMax) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onError
+        val backgroundColor = if (roundPlayed <= roundMax) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
+        val contentColor = if (roundPlayed <= roundMax) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onError
 
         Row(
             modifier = Modifier
@@ -945,7 +958,8 @@ fun AddPlayer(onAddPlayer:() -> Unit){
         verticalAlignment = Alignment.CenterVertically) {
         Text(
             modifier = Modifier.clickable { onAddPlayer() },
-            text = string_generico_add_new_palyer
+            text = string_generico_add_new_palyer,
+            color = MaterialTheme.colorScheme.tertiary
         )
     }
 }
