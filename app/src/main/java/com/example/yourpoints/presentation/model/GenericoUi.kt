@@ -40,7 +40,7 @@ data class GenericoUi(
     fun resetGame() = this.copy(
         finished = false,
         roundPlayed = 1,
-        player = this.player.map { it.copy(playerPoint = 0, addVictoryFlag = true) }
+        player = this.player.map { it.copy(playerPoint = this.pointToInit, addVictoryFlag = true) }
     )
 
     fun incRound() = this.copy(
