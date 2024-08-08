@@ -30,12 +30,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -48,6 +48,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -78,6 +79,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -92,6 +94,8 @@ import com.example.yourpoints.presentation.ui.theme.string_generico_date_created
 import com.example.yourpoints.presentation.ui.theme.string_generico_delete_player
 import com.example.yourpoints.presentation.ui.theme.string_generico_is_with_points
 import com.example.yourpoints.presentation.ui.theme.string_generico_name_game
+import com.example.yourpoints.presentation.ui.theme.string_generico_number_of_rounds
+import com.example.yourpoints.presentation.ui.theme.string_generico_number_of_rounds_played
 import com.example.yourpoints.presentation.ui.theme.string_util_new_name
 import com.example.yourpoints.presentation.ui.theme.string_generico_point_finish
 import com.example.yourpoints.presentation.ui.theme.string_generico_point_init
@@ -156,7 +160,7 @@ fun GenericoScreen(
                     onClickChangeViewSetPoints = { genericoViewModel.changeViewSetPoints() },
                     onClickResetGame = { genericoViewModel.resetGame() },
                     onSelectPlayer = { player -> genericoViewModel.setPlayerSelected(player) },
-                    onClickMenu = { showDialogMenu = true}
+                    onClickInfo = { showDialogMenu = true}
                 )
             }
         }
@@ -175,10 +179,9 @@ fun GenericoScreen(
                 genericoViewModel.changeName(it)
             }
         }
-        DialogMenu(
-            showDialogMenu,
-            game.name,
-            game.dataCreated,
+        DialogInfo(
+            showDialog = showDialogMenu,
+            game = game,
             onDismissRequest = { showDialogMenu = false}
         )
     }
@@ -656,11 +659,12 @@ fun Game(
     onClickChangeViewSetPoints:() -> Unit,
     onClickResetGame:() -> Unit,
     onSelectPlayer:(GenericoPlayerUi) -> Unit,
-    onClickMenu:() -> Unit
+    onClickInfo:() -> Unit
 ){
     val scrollState = rememberScrollState()
     val newPoints by remember { mutableStateOf( mutableListOf<Int>() ) }
     val backgroundColor = if (game.roundPlayed <= game.roundMax) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
+    val contentColor = if (game.roundPlayed <= game.roundMax) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onError
 
     if (newPoints.size != game.player.size){
         newPoints.clear()
@@ -676,9 +680,9 @@ fun Game(
             Modifier.fillMaxWidth().height(50.dp).background(backgroundColor),
             contentAlignment = Alignment.Center
             ){
-            RoundsPlayed(game.withRounds, game.roundPlayed, game.roundMax)
-            IconMenu(Modifier.align(Alignment.CenterEnd).padding(end = 16.dp)){
-                onClickMenu()
+            RoundsPlayed(game.withRounds, game.roundPlayed, game.roundMax, contentColor)
+            IconInfo(Modifier.align(Alignment.CenterEnd).padding(end = 16.dp), color = contentColor){
+                onClickInfo()
             }
         }
 
@@ -759,18 +763,17 @@ fun Game(
     }
 }
 @Composable
-fun IconMenu(modifier: Modifier, onClick:() -> Unit){
+fun IconInfo(modifier: Modifier, color: Color = LocalContentColor.current, onClick:() -> Unit){
     Icon(
         modifier = modifier.clickable {onClick() },
-        imageVector = Icons.Default.Menu, 
-        contentDescription = null 
+        imageVector = Icons.Default.Info,
+        contentDescription = null,
+        tint = color
     )
 }
 @Composable
-fun RoundsPlayed(withRounds: Boolean, roundPlayed: Int, roundMax: Int ){
+fun RoundsPlayed(withRounds: Boolean, roundPlayed: Int, roundMax: Int, contentColor: Color){
     if (!withRounds) return
-
-    val contentColor = if (roundPlayed <= roundMax) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onError
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -1204,25 +1207,88 @@ fun DialogChangeName(onDismissRequest:() -> Unit, onChangeName:(String) -> Unit)
 }
 
 @Composable
-fun DialogMenu(
+fun DialogInfo(
     showDialog: Boolean,
-    gameName:String,
-    dataCreated:String,
+    game: GenericoUi,
     onDismissRequest:() -> Unit
 ){
     if (!showDialog) return
 
     Dialog(onDismissRequest = { onDismissRequest() }){
-        Column(
-            Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-            Text(text = string_generico_name_game)
-            Text(text = gameName)
-            Text(text = string_generico_date_created)
-            Text(text = dataCreated)
+        Card (
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .padding(horizontal = 16.dp)
+                .border(2.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(12.dp)),
+            colors = CardDefaults.cardColors().copy(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                    Text(text = "${string_generico_name_game}: ")
+                    Text(text = game.name)
+                }
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                    Text(text = "${string_generico_date_created}: ")
+                    Text(text = game.dataCreated)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSecondaryContainer)
 
+                if (game.withPoints){
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                        Text(text = "${string_generico_point_init}: ")
+                        Text(text = game.pointToInit.toString())
+                    }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                        Text(text = "${string_generico_point_finish}: ")
+                        Text(text = game.pointToFinish.toString())
+                    }
+                    if (game.finishToWin) Text(text = string_generico_point_to_win)
+                    else Text(text = string_generico_point_to_lose)
+                    Spacer(modifier = Modifier.height(16.dp))
+                } else {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                        Text(text = "${string_generico_is_with_points}: ")
+                        Checkbox(
+                            checked = false,
+                            enabled = false,
+                            onCheckedChange = {  }
+                        )
+                    }
+                }
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSecondaryContainer)
+
+                if (game.withRounds){
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                        Text(text = "${string_generico_number_of_rounds_played}: ")
+                        Text(text = game.roundPlayed.toString())
+                    }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                        Text(text = "${string_generico_number_of_rounds}: ")
+                        Text(text = game.roundMax.toString())
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                } else {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                        Text(text = "${string_generico_title_rounds}: ")
+                        Checkbox(
+                            checked = false,
+                            enabled = false,
+                            onCheckedChange = {  }
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -1232,6 +1298,30 @@ fun ShowToast(text: String, clearToast:() -> Unit) {
     if (text.isNotEmpty()){
         Toast.makeText(context, "Error: Set Name", Toast.LENGTH_SHORT).show()
         clearToast()
+    }
+}
+
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewAux(){
+    val game = GenericoUi(
+        name = "Erich",
+        dataCreated = "2024-08-08 11:07:25",
+        withPoints = true,
+        pointToInit = 0,
+        pointToFinish = 100,
+        finishToWin = true,
+        withRounds = true,
+        roundMax = 10,
+        roundPlayed = 1
+    )
+    Box (Modifier.fillMaxSize()){
+        DialogInfo(
+            showDialog = true,
+            game = game,
+            onDismissRequest = { } ,
+        )
     }
 }
 
