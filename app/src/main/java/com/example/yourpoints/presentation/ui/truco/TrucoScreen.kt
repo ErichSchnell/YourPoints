@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -47,6 +48,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -54,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.yourpoints.R
 import com.example.yourpoints.domain.model.TypePlayer
+import com.example.yourpoints.presentation.model.TrucoPlayerUi
 import com.example.yourpoints.presentation.model.TrucoUi
 import com.example.yourpoints.presentation.ui.theme.string_cancel
 import com.example.yourpoints.presentation.ui.theme.string_create
@@ -179,9 +182,10 @@ fun TrucoAnnotator(
     increasePlayer2: () -> Unit,
     decreasePlayer2:() -> Unit
 ) {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Cabecera(
             modifier = Modifier
                 .height(100.dp)
@@ -221,21 +225,16 @@ fun Cabecera(
     Row (modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
 
         Text(
-            modifier = Modifier
-                .weight(1f)
-                .clickable { onClickPlayer1() },
+            modifier = Modifier.weight(1f).clickable { onClickPlayer1() },
             text = player1Name,
-            fontSize = 32.sp,
+            style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center
         )
         Icon(
-            modifier = Modifier
-                .padding(8.dp)
-                .size(44.dp)
-                .clickable { onClickSetting() },
+            modifier = Modifier.padding(8.dp).size(44.dp).clickable { onClickSetting() },
             imageVector = Icons.Default.Settings,
-            tint = MaterialTheme.colorScheme.tertiary,
+            tint = MaterialTheme.colorScheme.secondary,
             contentDescription = ""
         )
 
@@ -244,7 +243,7 @@ fun Cabecera(
                 .weight(1f)
                 .clickable { onClickPlayer2() },
             text = player2Name,
-            fontSize = 32.sp,
+            style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center
         )
@@ -270,7 +269,7 @@ fun Body(
                 .clickable { increasePlayer1() },
             playerPoint = game.player1.playerPoint
         )
-        VerticalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.inversePrimary)
+        VerticalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.secondary)
         PointsPlayer(
             modifier = Modifier
                 .weight(1f)
@@ -298,7 +297,7 @@ fun PointsPlayer(modifier: Modifier = Modifier, playerPoint: Int){
 
             if (i == 3){
                 HorizontalDivider(
-                    color = MaterialTheme.colorScheme.inversePrimary,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -346,23 +345,34 @@ fun RestarPuntos(
     decreasePlayer1:() -> Unit,
     decreasePlayer2:() -> Unit
 ) {
-    Row (modifier = modifier.border(border = BorderStroke(1.dp, MaterialTheme.colorScheme.inversePrimary))){
+    Row (modifier = modifier.border(border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary))){
         Box (modifier = Modifier
             .fillMaxHeight()
             .weight(1f)
-            .background(MaterialTheme.colorScheme.tertiary)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable { decreasePlayer1() },
             contentAlignment = Alignment.Center){
-            Text(text = string_restar_point, fontSize = 24.sp, color = MaterialTheme.colorScheme.onTertiary, fontWeight = FontWeight.ExtraLight)
+
+            Text(
+                text = string_restar_point,
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.ExtraLight
+            )
         }
-        VerticalDivider(color = MaterialTheme.colorScheme.inversePrimary)
+        VerticalDivider(color = MaterialTheme.colorScheme.primary)
         Box (modifier = Modifier
             .fillMaxHeight()
             .weight(1f)
-            .background(MaterialTheme.colorScheme.tertiary)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable { decreasePlayer2() },
             contentAlignment = Alignment.Center){
-            Text(text = string_restar_point, fontSize = 24.sp, color = MaterialTheme.colorScheme.onTertiary, fontWeight = FontWeight.ExtraLight)
+            Text(
+                text = string_restar_point,
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.ExtraLight
+            )
         }
     }
 }
@@ -376,8 +386,8 @@ fun SettingNewGame(onDismissRequest: () -> Unit = {}, onClickCancel:() -> Unit, 
     ){selectedPoint ->
         Button(
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary,
             ),onClick = { onClickCancel() }) {
             Text(text = string_cancel)
         }
@@ -385,8 +395,8 @@ fun SettingNewGame(onDismissRequest: () -> Unit = {}, onClickCancel:() -> Unit, 
         Button(
             enabled = selectedPoint != 0,
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary,
             ),onClick = { onClickCreate(selectedPoint) }) {
             Text(text = string_create)
         }
@@ -407,8 +417,8 @@ fun DialogSetting(pointCurrent:Int ,onDismissRequest:() -> Unit = {}, onClickRes
         Button(
             modifier = Modifier.padding(24.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary,
             ),onClick = { onClickResetAnnotator(selectedPoint) }) {
             Text(text = string_reset.uppercase())
         }
@@ -432,17 +442,24 @@ fun SelectPoints(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .padding(horizontal = 16.dp)
-                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)),
+            colors = CardDefaults.cardColors().copy(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
         ) {
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp))
-                .background(MaterialTheme.colorScheme.background),
+            Column(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(text = title, fontSize = 24.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineSmall,
+//                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
                 Spacer(modifier = Modifier.height(24.dp))
 
                 pointList.forEach { points ->
@@ -451,13 +468,11 @@ fun SelectPoints(
                             selected = selectedPoint == points,
                             onClick = { selectedPoint = points }
                         )
-                        Text(text = "$points", color = MaterialTheme.colorScheme.onBackground)
+                        Text(text = "$points")
                     }
                 }
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
+                    modifier = Modifier.fillMaxWidth().padding(24.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                     content = { content(selectedPoint) }
@@ -584,5 +599,62 @@ fun DialogFinishGame(winner:String, onClickCancel:() -> Unit, onClickResetAnnota
             }
         }
 
+    }
+}
+
+
+
+
+
+
+
+
+
+//@Preview(
+//    name = "game",
+//    showBackground = false,
+//)
+@Composable
+fun PreviewGame(){
+    val player1 = TrucoPlayerUi(
+        playerName = "player 1",
+        playerPoint = 5,
+        victories = 0
+    )
+    val player2 = TrucoPlayerUi(
+        playerName = "player 2",
+        playerPoint = 15,
+        victories = 0
+    )
+    val game = TrucoUi(
+        dataCreated = "2024-08-08 12:13:25",
+        pointLimit = 30,
+        player1 = player1,
+        player2 = player2,
+        winner = TypePlayer.VACIO,
+    )
+    Box(
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
+    ){
+        TrucoAnnotator(
+            game = game, {},{},{},{},{},{},{}
+        )
+    }
+}
+@Preview(
+    name = "setting",
+    showBackground = false,
+)
+@Composable
+fun PreviewSetting(){
+    Box(
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
+    ){
+        DialogSetting(
+            pointCurrent = 0,
+            {},{}
+        )
     }
 }
