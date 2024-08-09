@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -48,7 +49,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -56,7 +56,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.yourpoints.R
 import com.example.yourpoints.domain.model.TypePlayer
-import com.example.yourpoints.presentation.model.TrucoPlayerUi
 import com.example.yourpoints.presentation.model.TrucoUi
 import com.example.yourpoints.presentation.ui.theme.string_cancel
 import com.example.yourpoints.presentation.ui.theme.string_create
@@ -183,7 +182,9 @@ fun TrucoAnnotator(
     decreasePlayer2:() -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Cabecera(
@@ -225,14 +226,19 @@ fun Cabecera(
     Row (modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
 
         Text(
-            modifier = Modifier.weight(1f).clickable { onClickPlayer1() },
+            modifier = Modifier
+                .weight(1f)
+                .clickable { onClickPlayer1() },
             text = player1Name,
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center
         )
         Icon(
-            modifier = Modifier.padding(8.dp).size(44.dp).clickable { onClickSetting() },
+            modifier = Modifier
+                .padding(8.dp)
+                .size(44.dp)
+                .clickable { onClickSetting() },
             imageVector = Icons.Default.Settings,
             tint = MaterialTheme.colorScheme.secondary,
             contentDescription = ""
@@ -472,7 +478,9 @@ fun SelectPoints(
                     }
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                     content = { content(selectedPoint) }
@@ -560,21 +568,34 @@ fun DialogFinishGame(winner:String, onClickCancel:() -> Unit, onClickResetAnnota
                 .clip(RoundedCornerShape(12.dp))
                 .padding(horizontal = 16.dp)
                 .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)),
-
-            ) {
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.background),
+            colors = CardDefaults.cardColors().copy(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                    Text(text = string_winner_game, fontSize = 24.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                    Text(text = " $winner", fontSize = 24.sp, color = MaterialTheme.colorScheme.inversePrimary, fontWeight = FontWeight.Bold)
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(
+                        text = string_winner_game,
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(text = " $winner",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Row (modifier = Modifier
                     .fillMaxWidth()
@@ -582,16 +603,16 @@ fun DialogFinishGame(winner:String, onClickCancel:() -> Unit, onClickResetAnnota
                     Button(
                         modifier = Modifier.padding(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.onSecondary
                         ),onClick = {onClickCancel()}) {
                         Text(text = string_cancel)
                     }
                     Button(
                         modifier = Modifier.padding(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.onSecondary
                         ),onClick = {onClickResetAnnotator()}) {
                         Text(text = string_reset)
                     }
@@ -599,62 +620,5 @@ fun DialogFinishGame(winner:String, onClickCancel:() -> Unit, onClickResetAnnota
             }
         }
 
-    }
-}
-
-
-
-
-
-
-
-
-
-//@Preview(
-//    name = "game",
-//    showBackground = false,
-//)
-@Composable
-fun PreviewGame(){
-    val player1 = TrucoPlayerUi(
-        playerName = "player 1",
-        playerPoint = 5,
-        victories = 0
-    )
-    val player2 = TrucoPlayerUi(
-        playerName = "player 2",
-        playerPoint = 15,
-        victories = 0
-    )
-    val game = TrucoUi(
-        dataCreated = "2024-08-08 12:13:25",
-        pointLimit = 30,
-        player1 = player1,
-        player2 = player2,
-        winner = TypePlayer.VACIO,
-    )
-    Box(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
-    ){
-        TrucoAnnotator(
-            game = game, {},{},{},{},{},{},{}
-        )
-    }
-}
-@Preview(
-    name = "setting",
-    showBackground = false,
-)
-@Composable
-fun PreviewSetting(){
-    Box(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
-    ){
-        DialogSetting(
-            pointCurrent = 0,
-            {},{}
-        )
     }
 }
