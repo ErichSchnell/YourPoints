@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -50,7 +49,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -63,7 +61,7 @@ import com.example.yourpoints.presentation.ui.theme.string_create_game
 import com.example.yourpoints.presentation.ui.theme.string_util_new_name
 import com.example.yourpoints.presentation.ui.theme.string_util_update_name
 import com.example.yourpoints.presentation.ui.theme.string_reset
-import com.example.yourpoints.presentation.ui.theme.string_restar_point
+import com.example.yourpoints.presentation.ui.theme.string_restart_point
 import com.example.yourpoints.presentation.ui.theme.string_setting_points
 import com.example.yourpoints.presentation.ui.theme.string_winner_game
 
@@ -360,7 +358,7 @@ fun RestarPuntos(
             contentAlignment = Alignment.Center){
 
             Text(
-                text = string_restar_point,
+                text = string_restart_point,
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontWeight = FontWeight.ExtraLight
@@ -374,7 +372,7 @@ fun RestarPuntos(
             .clickable { decreasePlayer2() },
             contentAlignment = Alignment.Center){
             Text(
-                text = string_restar_point,
+                text = string_restart_point,
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontWeight = FontWeight.ExtraLight

@@ -9,8 +9,7 @@ import com.example.yourpoints.domain.annotatorGenerico.UpdateGenericoGameUseCase
 import com.example.yourpoints.domain.model.toDomain
 import com.example.yourpoints.presentation.model.GenericoPlayerUi
 import com.example.yourpoints.presentation.model.GenericoUi
-import com.example.yourpoints.presentation.ui.theme.string_generico
-import com.example.yourpoints.presentation.ui.theme.string_generico_name_empty
+import com.example.yourpoints.presentation.ui.theme.string_generic_name_empty
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -88,7 +87,7 @@ class GenericoViewModel @Inject constructor(
         rounds: Int,
         cantPlayers: Int,
     ) {
-        if (name.isEmpty()){ _showToast.value = string_generico_name_empty ; return }
+        if (name.isEmpty()){ _showToast.value = string_generic_name_empty ; return }
 
         val players: MutableList<GenericoPlayerUi> = mutableListOf()
         for(i in 0 until cantPlayers){

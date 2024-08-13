@@ -86,24 +86,24 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.yourpoints.R
 import com.example.yourpoints.presentation.model.GenericoPlayerUi
 import com.example.yourpoints.presentation.model.GenericoUi
-import com.example.yourpoints.presentation.ui.theme.string_generico_add_new_palyer
-import com.example.yourpoints.presentation.ui.theme.string_generico_cant_players
-import com.example.yourpoints.presentation.ui.theme.string_generico_change_name
-import com.example.yourpoints.presentation.ui.theme.string_generico_date_created
-import com.example.yourpoints.presentation.ui.theme.string_generico_delete_player
-import com.example.yourpoints.presentation.ui.theme.string_generico_is_with_points
-import com.example.yourpoints.presentation.ui.theme.string_generico_name_game
-import com.example.yourpoints.presentation.ui.theme.string_generico_number_of_rounds
-import com.example.yourpoints.presentation.ui.theme.string_generico_number_of_rounds_played
+import com.example.yourpoints.presentation.ui.theme.string_generic_add_new_palyer
+import com.example.yourpoints.presentation.ui.theme.string_generic_cant_players
+import com.example.yourpoints.presentation.ui.theme.string_generic_change_name
+import com.example.yourpoints.presentation.ui.theme.string_generic_date_created
+import com.example.yourpoints.presentation.ui.theme.string_generic_delete_player
+import com.example.yourpoints.presentation.ui.theme.string_generic_is_with_points
+import com.example.yourpoints.presentation.ui.theme.string_generic_name_game
+import com.example.yourpoints.presentation.ui.theme.string_generic_number_of_rounds
+import com.example.yourpoints.presentation.ui.theme.string_generic_number_of_rounds_played
 import com.example.yourpoints.presentation.ui.theme.string_util_new_name
-import com.example.yourpoints.presentation.ui.theme.string_generico_point_finish
-import com.example.yourpoints.presentation.ui.theme.string_generico_point_init
-import com.example.yourpoints.presentation.ui.theme.string_generico_point_to_lose
-import com.example.yourpoints.presentation.ui.theme.string_generico_point_to_win
-import com.example.yourpoints.presentation.ui.theme.string_generico_prefix_rounds
-import com.example.yourpoints.presentation.ui.theme.string_generico_select_name
-import com.example.yourpoints.presentation.ui.theme.string_generico_setting
-import com.example.yourpoints.presentation.ui.theme.string_generico_title_rounds
+import com.example.yourpoints.presentation.ui.theme.string_generic_point_finish
+import com.example.yourpoints.presentation.ui.theme.string_generic_point_init
+import com.example.yourpoints.presentation.ui.theme.string_generic_point_to_lose
+import com.example.yourpoints.presentation.ui.theme.string_generic_point_to_win
+import com.example.yourpoints.presentation.ui.theme.string_generic_prefix_rounds
+import com.example.yourpoints.presentation.ui.theme.string_generic_select_name
+import com.example.yourpoints.presentation.ui.theme.string_generic_setting
+import com.example.yourpoints.presentation.ui.theme.string_generic_title_rounds
 import com.example.yourpoints.presentation.ui.theme.string_util_update_name
 
 private const val TAG = "GenericoScreen Intern Test"
@@ -326,7 +326,7 @@ fun CreateGame(
 fun SetName(modifier: Modifier = Modifier, name:String, textFieldColors: TextFieldColors = TextFieldDefaults.colors(), onValueChange:(String) -> Unit){
     Column(modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = string_generico_name_game,
+            text = string_generic_name_game,
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.primary
         )
@@ -347,7 +347,7 @@ fun SetName(modifier: Modifier = Modifier, name:String, textFieldColors: TextFie
 fun CantPlayers(modifier: Modifier = Modifier, cantPlayers:Int, textFieldColors: TextFieldColors = TextFieldDefaults.colors(), onValueChange:(Int) -> Unit){
     ChangeNumber(
         modifier,
-        title = string_generico_cant_players,
+        title = string_generic_cant_players,
         titleColor = MaterialTheme.colorScheme.primary,
         value = cantPlayers,
         textFieldColors = textFieldColors,
@@ -395,7 +395,7 @@ fun Points(
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = string_generico_is_with_points,
+                    text = string_generic_is_with_points,
                     style = MaterialTheme.typography.headlineMedium,
                     color = pointContentColor
                 )
@@ -411,7 +411,7 @@ fun Points(
                 Column{
                     ChangeNumber(
                         modifier = Modifier.fillMaxWidth(),
-                        title = string_generico_point_init,
+                        title = string_generic_point_init,
                         titleStyle = MaterialTheme.typography.titleLarge,
                         titleColor = MaterialTheme.colorScheme.secondary,
                         value = pointInit,
@@ -421,7 +421,7 @@ fun Points(
                     Spacer(modifier = Modifier.width(12.dp))
                     ChangeNumber(
                         modifier = Modifier.fillMaxWidth(),
-                        title = string_generico_point_finish,
+                        title = string_generic_point_finish,
                         titleStyle = MaterialTheme.typography.titleLarge,
                         titleColor = MaterialTheme.colorScheme.secondary,
                         value = pointFinish,
@@ -451,7 +451,7 @@ fun FinishToWin(modifier: Modifier, finishToWin: Boolean, onClickFinishToWin: (B
                 )
             )
             Text(
-                text = string_generico_point_to_win,
+                text = string_generic_point_to_win,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.secondary
             )
@@ -463,7 +463,7 @@ fun FinishToWin(modifier: Modifier, finishToWin: Boolean, onClickFinishToWin: (B
                     unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 ))
             Text(
-                text = string_generico_point_to_lose,
+                text = string_generic_point_to_lose,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.secondary
             )
@@ -505,7 +505,7 @@ fun Rounds(
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = string_generico_title_rounds,
+                    text = string_generic_title_rounds,
                     style = MaterialTheme.typography.headlineMedium,
                     color = pointContentColor
                 )
@@ -554,7 +554,7 @@ fun SelectName(
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = string_generico_select_name,
+            text = string_generic_select_name,
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center
@@ -779,7 +779,7 @@ fun RoundsPlayed(withRounds: Boolean, roundPlayed: Int, roundMax: Int, contentCo
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "$string_generico_prefix_rounds $roundPlayed de $roundMax",
+            text = "$string_generic_prefix_rounds $roundPlayed de $roundMax",
             style = MaterialTheme.typography.titleLarge,
             color = contentColor
         )
@@ -985,7 +985,7 @@ fun AddPlayer(onAddPlayer:() -> Unit){
         verticalAlignment = Alignment.CenterVertically) {
         Text(
             modifier = Modifier.clickable { onAddPlayer() },
-            text = string_generico_add_new_palyer,
+            text = string_generic_add_new_palyer,
             color = MaterialTheme.colorScheme.tertiary
         )
     }
@@ -1101,7 +1101,7 @@ fun DialogSettingPlayer(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = string_generico_setting,
+                    text = string_generic_setting,
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -1116,7 +1116,7 @@ fun DialogSettingPlayer(
                         onSetDialogChangeName()
                     },
                 ) {
-                    Text(text = string_generico_change_name)
+                    Text(text = string_generic_change_name)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -1130,7 +1130,7 @@ fun DialogSettingPlayer(
                     },
 
                     ) {
-                    Text(text = string_generico_delete_player)
+                    Text(text = string_generic_delete_player)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -1231,11 +1231,11 @@ fun DialogInfo(
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                    Text(text = "${string_generico_name_game}: ")
+                    Text(text = "${string_generic_name_game}: ")
                     Text(text = game.name)
                 }
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                    Text(text = "${string_generico_date_created}: ")
+                    Text(text = "${string_generic_date_created}: ")
                     Text(text = game.dataCreated)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
@@ -1244,19 +1244,19 @@ fun DialogInfo(
                 if (game.withPoints){
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                        Text(text = "${string_generico_point_init}: ")
+                        Text(text = "${string_generic_point_init}: ")
                         Text(text = game.pointToInit.toString())
                     }
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                        Text(text = "${string_generico_point_finish}: ")
+                        Text(text = "${string_generic_point_finish}: ")
                         Text(text = game.pointToFinish.toString())
                     }
-                    if (game.finishToWin) Text(text = string_generico_point_to_win)
-                    else Text(text = string_generico_point_to_lose)
+                    if (game.finishToWin) Text(text = string_generic_point_to_win)
+                    else Text(text = string_generic_point_to_lose)
                     Spacer(modifier = Modifier.height(16.dp))
                 } else {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                        Text(text = "${string_generico_is_with_points}: ")
+                        Text(text = "${string_generic_is_with_points}: ")
                         Checkbox(
                             checked = false,
                             enabled = false,
@@ -1269,17 +1269,17 @@ fun DialogInfo(
                 if (game.withRounds){
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                        Text(text = "${string_generico_number_of_rounds_played}: ")
+                        Text(text = "${string_generic_number_of_rounds_played}: ")
                         Text(text = game.roundPlayed.toString())
                     }
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                        Text(text = "${string_generico_number_of_rounds}: ")
+                        Text(text = "${string_generic_number_of_rounds}: ")
                         Text(text = game.roundMax.toString())
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                 } else {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                        Text(text = "${string_generico_title_rounds}: ")
+                        Text(text = "${string_generic_title_rounds}: ")
                         Checkbox(
                             checked = false,
                             enabled = false,
