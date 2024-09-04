@@ -55,7 +55,7 @@ class GetAllTrucoGameUseCaseTest{
         val listDomain = listOf(
             TrucoDomain(
                 id = 1,
-                dataCreated = "hola",
+                dataCreated = "Hello",
                 pointLimit = 12,
                 player1 = TrucoPlayerUi().toDomain(),
                 player2 = TrucoPlayerUi().toDomain(),
@@ -63,7 +63,7 @@ class GetAllTrucoGameUseCaseTest{
             ),
             TrucoDomain(
                 id = 2,
-                dataCreated = "hola2",
+                dataCreated = "Hello2",
                 pointLimit = 15,
                 player1 = TrucoPlayerUi().toDomain(),
                 player2 = TrucoPlayerUi().toDomain(),

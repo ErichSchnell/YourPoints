@@ -49,7 +49,7 @@ class GetTrucoGameUseCaseTest{
         //Given
         val gameDomain = TrucoDomain(
             id = 2,
-            dataCreated = "fechaX",
+            dataCreated = "DateX",
             pointLimit = 30,
             player1 = TrucoPlayerUi().toDomain(),
             player2 = TrucoPlayerUi().toDomain(),

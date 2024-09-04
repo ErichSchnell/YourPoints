@@ -660,10 +660,13 @@ fun Game(
     onSelectPlayer:(GenericoPlayerUi) -> Unit,
     onClickInfo:() -> Unit
 ){
+    val isRoundsExceeded = (game.roundPlayed > game.roundMax && game.withRounds)
+
+
     val scrollState = rememberScrollState()
     val newPoints by remember { mutableStateOf( mutableListOf<Int>() ) }
-    val backgroundColor = if (game.roundPlayed <= game.roundMax) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
-    val contentColor = if (game.roundPlayed <= game.roundMax) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onError
+    val backgroundColor = if (!isRoundsExceeded) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
+    val contentColor = if (!isRoundsExceeded) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onError
 
     if (newPoints.size != game.player.size){
         newPoints.clear()
@@ -676,11 +679,17 @@ fun Game(
 
     Column {
         Box(
-            Modifier.fillMaxWidth().height(50.dp).background(backgroundColor),
+            Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .background(backgroundColor),
             contentAlignment = Alignment.Center
             ){
             RoundsPlayed(game.withRounds, game.roundPlayed, game.roundMax, contentColor)
-            IconInfo(Modifier.align(Alignment.CenterEnd).padding(end = 16.dp), color = contentColor){
+            IconInfo(
+                Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 16.dp), color = contentColor){
                 onClickInfo()
             }
         }
@@ -709,53 +718,43 @@ fun Game(
             Spacer(modifier = Modifier.weight(1f))
 
 
-            if (game.isSetPoint){
-                FloatingActionButton(modifier = Modifier
+            Row(
+                Modifier
+                    .fillMaxWidth()
                     .padding(24.dp)
-                    .align(Alignment.End),
+            ) {
+                if (game.finished || isRoundsExceeded) {
+                    FloatingActionButton(
+                        onClick = {
+                            newPoints.clear()
+                            onClickResetGame()
+                        },
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                FloatingActionButton(
                     onClick = {
-                        onValueChange(newPoints)
+                        if (game.isSetPoint) onValueChange(newPoints)
+                        else onClickChangeViewSetPoints()
                     },
                     containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
                 ) {
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
                         contentDescription = null,
                         modifier = Modifier.size(18.dp)
                     )
-                }
-            } else {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp) ) {
-                    if (game.finished || game.roundPlayed > game.roundMax){
-                        FloatingActionButton(
-                            onClick = { onClickResetGame() },
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            contentColor = MaterialTheme.colorScheme.onSecondary,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    FloatingActionButton(
-                        onClick = { onClickChangeViewSetPoints() },
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary,) {
-                        Icon(
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
                 }
             }
         }
@@ -772,14 +771,18 @@ fun IconInfo(modifier: Modifier, color: Color = LocalContentColor.current, onCli
 }
 @Composable
 fun RoundsPlayed(withRounds: Boolean, roundPlayed: Int, roundMax: Int, contentColor: Color){
-    if (!withRounds) return
+    val text = if (withRounds) {
+        "$string_generic_prefix_rounds $roundPlayed de $roundMax"
+    } else {
+        "$string_generic_prefix_rounds $roundPlayed"
+    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "$string_generic_prefix_rounds $roundPlayed de $roundMax",
+            text = text,
             style = MaterialTheme.typography.titleLarge,
             color = contentColor
         )
